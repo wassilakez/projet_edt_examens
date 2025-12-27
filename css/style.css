@@ -59,3 +59,17 @@ th {
 tr:nth-child(even) {
     background-color: #f9f9f9;
 }
+/* Pour s'assurer que les boutons sont bien espacés et centrés */
+.container div {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Espace entre les boutons */
+    flex-wrap: wrap; /* Si l'écran est petit, les boutons passent à la ligne */
+    margin-top: 30px;
+}
+
+/* Optionnel : Une couleur différente pour le bouton Professeur pour le distinguer */
+/* Tu peux ajouter cette classe spécifique si tu veux changer sa couleur */
+.btn-prof {
+    background-color: #8e44ad; /* Un beau violet pour le prof */
+}
