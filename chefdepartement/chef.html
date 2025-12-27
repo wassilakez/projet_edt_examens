@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Plateforme Examens – Chef de Département</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; background:#f4f4f4; }
+    header { background:#004080; color:white; padding:15px; display:flex; justify-content:space-between; }
+    .container { display:flex; }
+    aside { width:220px; background:#ddd; padding:10px; }
+    aside ul { list-style:none; padding:0; }
+    aside li { padding:10px; margin:5px 0; background:#004080; color:white; cursor:pointer; border-radius:5px; }
+    aside li:hover { background:#0066cc; }
+    main { flex:1; padding:20px; }
+    section { display:none; background:white; padding:20px; border-radius:8px; box-shadow:0 0 5px rgba(0,0,0,0.2); }
+    section.active { display:block; }
+    table { width:100%; border-collapse:collapse; margin-top:15px; }
+    th, td { border:1px solid #ccc; padding:8px; text-align:center; }
+    .actions button { margin:10px; padding:10px 20px; border:none; border-radius:5px; cursor:pointer; }
+    .btn-validate { background:#28a745; color:white; }
+    .btn-reject { background:#dc3545; color:white; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h2>Faculté des Sciences – Chef de Département</h2>
+  <div class="profile">Chef de Département | Déconnexion</div>
+</header>
+
+<div class="container">
+
+  <!-- MENU LATERAL -->
+  <aside>
+    <ul>
+      <li onclick="showSection('validation')">✅ Validation par Département</li>
+      <li onclick="showSection('statistiques')">📊 Statistiques par Formation</li>
+      <li onclick="showSection('conflits')">⚠️ Conflits par Formation</li>
+    </ul>
+  </aside>
+
+  <!-- CONTENU PRINCIPAL -->
+  <main>
+
+    <!-- VALIDATION PAR DÉPARTEMENT -->
+    <section id="validation" class="page-section active">
+      <h3>Validation des Emplois du Temps par Département</h3>
+      <p>Veuillez examiner les emplois du temps et valider ou demander des ajustements.</p>
+      <div class="actions">
+        <button class="btn-validate" onclick="validateEDT()">✅ Valider</button>
+        <button class="btn-reject" onclick="rejectEDT()">❌ Rejeter</button>
+      </div>
+      <p id="resultValidation"></p>
+    </section>
+
+    <!-- STATISTIQUES PAR FORMATION -->
+    <section id="statistiques" class="page-section">
+      <h3>Statistiques des Formations</h3>
+      <table>
+        <tr><th>Formation</th><th>Nombre d'Étudiants</th><th>Taux de Réussite</th></tr>
+        <tr><td>Informatique</td><td>800</td><td>85%</td></tr>
+        <tr><td>Mathématiques</td><td>600</td><td>90%</td></tr>
+        <tr><td>Physique</td><td>500</td><td>78%</td></tr>
+        <!-- Ajouter plus de formations si nécessaire -->
+      </table>
+    </section>
+
+    <!-- CONFLITS PAR FORMATION -->
+    <section id="conflits" class="page-section">
+      <h3>Conflits Détectés par Formation</h3>
+      <table>
+        <tr><th>Formation</th><th>Conflits</th><th>Statut</th></tr>
+        <tr><td>Informatique</td><td>3</td><td>À traiter</td></tr>
+        <tr><td>Mathématiques</td><td>2</td><td>Résolu</td></tr>
+        <tr><td>Physique</td><td>1</td><td>À traiter</td></tr>
+      </table>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+  function validateEDT() {
+    document.getElementById("resultValidation").innerHTML = "✅ Emploi du temps validé.";
+  }
+  function rejectEDT() {
+    document.getElementById("resultValidation").innerHTML = "❌ Emploi du temps rejeté.";
+  }
+</script>
+
+</body>
+</html>
