@@ -1,56 +1,42 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Espace Professeur - Planning des Surveillances</title>
-    <link rel="stylesheet" href="../css/style.css">
-</head>
-<body>
+<?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+session_start();
+require_once('../includes/connect.php'); 
 
-<div class="container">
-    <a href="../index.php" style="text-decoration: none;">⬅ Retour à l'accueil</a>
-    <header>
-        <h1>Université XYZ</h1>
-        <h2>Mon Planning de Surveillance</h2>
-        <p>Bienvenue, M. le Professeur</p>
-    </header>
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'professeur') {
+    header("Location: ../login.php?role=professeur");
+    exit();
+}
 
-    <div class="card">
-        <h3>Calendrier des examens à surveiller</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Heure</th>
-                    <th>Matière</th>
-                    <th>Salle</th>
-                    <th>Place affectée</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>15/01/2024</td>
-                    <td>09:00 - 11:00</td>
-                    <td>Mathématiques Avancées</td>
-                    <td>Amphi A</td>
-                    <td>Surveillant Chef</td>
-                </tr>
-                <tr>
-                    <td>17/01/2024</td>
-                    <td>14:00 - 16:00</td>
-                    <td>Physique Quantique</td>
-                    <td>Salle 102</td>
-                    <td>Surveillant Adjoint</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+$username = $_SESSION['username']; // Utilise le matricule (ex: P001)
 
-    <div style="margin-top: 20px;">
-        <a href="../index.php" class="btn-secondary">Déconnexion</a>
-    </div>
-</div>
+try {
+    // 1. On récupère d'abord le nom du prof pour l'affichage
+    $sql_prof = "SELECT nom, prenom FROM utilisateurs WHERE username = :uname";
+    $stmt_prof = $pdo->prepare($sql_prof);
+    $stmt_prof->execute(['uname' => $username]);
+    $prof_data = $stmt_prof->fetch();
+    
+    // On crée la variable que le HTML attend
+    $prof_nom = $prof_data ? $prof_data['prenom'] . " " . $prof_data['nom'] : $username;
 
-</body>
-</html>
+    // 2. Requête pour le planning
+    $sql = "SELECT e.date_examen, e.heure_debut,e.duree_minutes, m.nom as matiere, l.nom as salle, l.type
+            FROM examens e
+            JOIN modules m ON e.module_id = m.id
+            JOIN lieu_examen l ON e.salle_id = l.id
+            JOIN utilisateurs u ON e.prof_id = u.id
+            WHERE u.username = :uname
+            ORDER BY e.date_examen ASC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['uname' => $username]);
+    $surveillances = $stmt->fetchAll();
+
+} catch (PDOException $e) {
+    die("Erreur SQL : " . $e->getMessage());
+}
+
+include 'planning.html';
+?>

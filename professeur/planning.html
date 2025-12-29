@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espace Professeur - Planning des Surveillances</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --prof-primary: #2c3e50;
+            --prof-secondary: #34495e;
+            --prof-accent: #e67e22; /* Orange pour attirer l'attention sur les surveillances */
+            --bg-body: #f4f7f6;
+        }
+
+        body {
+             
+    font-family: 'Poppins', sans-serif;
+    /* Mise à jour du chemin et ajout des réglages de taille */
+    background-image: url('../planing.avif'); /* Retrait du / si l'image est à côté du fichier */
+    
+    background-attachment: fixed;      /* L'image reste fixe lors du scroll */
+    background-size: cover;            /* L'image couvre tout l'écran */
+    background-position: center;       /* L'image est centrée */
+    background-repeat: no-repeat;      /* Évite les répétitions */
+    color: #2c3e50;
+    min-height: 100vh;
+
+        }
+
+        .dashboard-container {
+            max-width: 1100px;
+            margin: 40px auto;
+        }
+
+        /* Header Style */
+        .prof-header {
+            background: linear-gradient(135deg, var(--prof-primary), var(--prof-secondary));
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .prof-header h1 { font-weight: 700; font-size: 1.8rem; }
+        .prof-header p { opacity: 0.9; font-weight: 300; }
+
+        .welcome-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-top: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        /* Planning Table */
+        .planning-card {
+            background: white;
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .table thead {
+            background-color: #f8f9fa;
+        }
+
+        .table thead th {
+            color: var(--prof-primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            padding: 20px;
+            border: none;
+        }
+
+        .table tbody td {
+            padding: 20px;
+            vertical-align: middle;
+            border-bottom: 1px solid #eee;
+        }
+
+        .badge-role {
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .role-chef { background-color: #fff3e0; color: #e67e22; border: 1px solid #ffe0b2; }
+        .role-simple { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+
+        .time-tag {
+            color: var(--prof-primary);
+            font-weight: 700;
+            background: #f0f3f5;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        /* Logout Button */
+        .btn-logout {
+            background: white;
+            color: #e74c3c;
+            border: 2px solid #e74c3c;
+            padding: 10px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-logout:hover {
+            background: #e74c3c;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container dashboard-container">
+    
+    <header class="prof-header d-flex justify-content-between align-items-center">
+        <div>
+            <p class="mb-1 text-uppercase letter-spacing-1">Portail Enseignant</p>
+            <h1><i class="fas fa-user-tie me-2"></i> Mon Planning de Surveillance</h1>
+            <div class="welcome-badge">
+                <i class="fas fa-hand-sparkles me-2 text-warning"></i> 
+                Bienvenue, <strong>M. <?php echo htmlspecialchars($prof_nom); ?></strong>
+            </div>
+        </div>
+        <div class="d-none d-md-block text-end">
+            <i class="fas fa-university fa-3x opacity-25"></i>
+        </div>
+    </header>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                    <i class="fas fa-file-signature"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-0">Total Surveillances</h6>
+                    <h4 class="fw-bold mb-0"><?php echo count($surveillances); ?> Examens</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="planning-card animate__animated animate__fadeIn">
+        <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold"><i class="far fa-calendar-alt me-2 text-primary"></i> Calendrier des Examens</h5>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Horaire & Durée</th>
+                        <th>Matière</th>
+                        <th>Lieu</th>
+                        <th>Statut / Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (count($surveillances) > 0): ?>
+                        <?php foreach ($surveillances as $row): ?>
+                        <tr>
+                            <td class="fw-medium">
+                                <i class="far fa-calendar-check text-muted me-2"></i>
+                                <?php echo date('d/m/Y', strtotime($row['date_examen'])); ?>
+                            </td>
+                            <td>
+                                <span class="time-tag"><?php echo substr($row['heure_debut'], 0, 5); ?></span>
+                                <small class="text-muted ms-2">(<?php echo $row['duree_minutes']; ?> min)</small>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark"><?php echo htmlspecialchars($row['matiere']); ?></div>
+                                <small class="text-muted">Code Module: M<?php echo $row['date_examen']; ?> </small>
+                            </td>
+                            <td>
+                                <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                <strong><?php echo htmlspecialchars($row['salle']); ?></strong>
+                            </td>
+                            <td>
+                                <?php if($row['type'] == 'Amphi'): ?>
+                                    <span class="badge-role role-chef">Chef de Salle</span>
+                                <?php else: ?>
+                                    <span class="badge-role role-simple">Surveillant</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <img src="https://cdn-icons-png.flaticon.com/512/4076/4076432.png" width="80" class="mb-3 opacity-50">
+                                <p class="text-muted">Aucune surveillance prévue dans votre calendrier.</p>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-5 d-flex justify-content-between align-items-center">
+        <p class="text-muted small mb-0">© 2025 Système de Gestion des Examens - Version 1.0</p>
+        <a href="../logout.php" class="btn-logout shadow-sm">
+            <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

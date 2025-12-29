@@ -9,7 +9,7 @@ body {
   background-color: #f4f7f6;
   margin: 0;
   padding: 0;
-  color: #333;
+  color: #f6f4f4;
 }
 
 header {
@@ -29,7 +29,7 @@ header {
 .button-link {
   display: inline-block;
   padding: 15px 30px;
-  background-color: #3498db;
+  background-color: #075182;
   color: white;
   text-decoration: none;
   border-radius: 8px;

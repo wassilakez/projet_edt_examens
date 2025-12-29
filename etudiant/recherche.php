@@ -1,51 +1,62 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Recherche de Salle - Étudiant</title>
-    <link rel="stylesheet" href="../css/style.css">
-</head>
+<?php
+session_start();
+require_once('../includes/connect.php'); 
 
-<body>
-    <header>
-        <h1>Espace Étudiant</h1>
-    </header>
+$resultats = [];
+$erreur = "";
+$nom_formation_saisi = "";
 
-    <div class="container">
-        <a href="../index.php" style="text-decoration: none;">⬅ Retour à l'accueil</a>
-        
-        <div style="background: white; padding: 30px; border-radius: 10px; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-            
-        <h2>🔍 Trouver ma place d'examen</h2>
-            <p>Saisissez votre numéro de matricule pour connaître votre affectation.</p>
-            
-            <form action="recherche.php" method="GET" style="margin-top: 20px;">
-                <input type="text" name="matricule" placeholder="Ex: 2121350088..." required style="width: 70%; font-size: 16px;">
-                <button type="submit">Rechercher</button>
-            </form>
-        </div>
+try {
+    // 1. Récupérer tous les départements pour la liste déroulante
+    $stmtDept = $pdo->query("SELECT * FROM departements ORDER BY nom ASC");
+    $departements = $stmtDept->fetchAll();
 
-        <div style="margin-top: 30px;">
-            <h3>Votre résultat :</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nom & Prénom</th>
-                        <th>Salle</th>
-                        <th>Bâtiment</th>
-                        <th>N° Table</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Jean Dupont</td>
-                        <td>Amphi A</td>
-                        <td>Faculté des Sciences</td>
-                        <td>124</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</body>
-</html>
+    // 2. Traitement de la recherche
+    if (isset($_GET['rechercher'])) {
+        $id_dept = $_GET['dept_id'] ?? '';
+        $nom_formation_saisi = trim($_GET['nom_formation'] ?? '');
+
+        if (!empty($nom_formation_saisi)) {
+            // ÉTAPE A : Vérifier si le NOM de la formation existe (optionnellement dans ce département)
+            $checkSql = "SELECT id FROM formations WHERE nom = :nom";
+            $params = ['nom' => $nom_formation_saisi];
+
+            if (!empty($id_dept)) {
+                $checkSql .= " AND dept_id = :dept_id";
+                $params['dept_id'] = $id_dept;
+            }
+
+            $stmtCheck = $pdo->prepare($checkSql);
+            $stmtCheck->execute($params);
+            $formation = $stmtCheck->fetch();
+
+            if (!$formation) {
+                $erreur = "Erreur : La formation '" . htmlspecialchars($nom_formation_saisi) . "' n'existe pas ou n'appartient pas à ce département.";
+            } else {
+                // ÉTAPE B : Récupérer les examens
+                $sql = "SELECT e.*, m.nom as matiere, l.nom as salle, u.nom as prof 
+                        FROM examens e
+                        JOIN modules m ON e.module_id = m.id
+                        JOIN lieu_examen l ON e.salle_id = l.id
+                        JOIN utilisateurs u ON e.prof_id = u.id
+                        WHERE m.formation_id = :form_id
+                        ORDER BY e.date_examen ASC, e.heure_debut ASC";
+                
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute(['form_id' => $formation['id']]);
+                $resultats = $stmt->fetchAll();
+                
+                if (empty($resultats)) {
+                    $erreur = "Aucun examen trouvé pour cette formation.";
+                }
+            }
+        } else {
+            $erreur = "Veuillez saisir le nom d'une formation.";
+        }
+    }
+} catch (PDOException $e) {
+    die("Erreur technique : " . $e->getMessage());
+}
+
+include 'recherche.html';
+?>
