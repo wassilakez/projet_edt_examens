@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Plateforme d'Examens – Administrateur</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; }
+    header { background: #004080; color: white; padding: 15px; display: flex; justify-content: space-between; }
+    .container { display: flex; }
+    aside { width: 220px; background: #ddd; padding: 10px; }
+    aside ul { list-style: none; padding: 0; }
+    aside li { padding: 10px; margin: 5px 0; background: #004080; color: white; cursor: pointer; border-radius: 5px; }
+    aside li:hover { background: #0066cc; }
+    main { flex: 1; padding: 20px; }
+    section { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); }
+    section.active { display: block; }
+    button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    .btn-generate { background: #28a745; color: white; }
+    .btn-detect { background: #ffc107; }
+    .btn-optimize { background: #dc3545; color: white; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h2>Faculté des Sciences – Administrateur des Examens</h2>
+  <div class="profile">Administrateur | Déconnexion</div>
+</header>
+
+<div class="container">
+  <aside>
+    <ul>
+      <li onclick="showSection('generation')">⚙️ Génération EDT</li>
+      <li onclick="showSection('conflits')">⚠️ Détection des conflits</li>
+      <li onclick="showSection('ressources')">📊 Optimisation des ressources</li>
+      <li onclick="showSection('rapports')">📄 Rapports</li>
+    </ul>
+  </aside>
+
+  <main>
+    <section id="generation" class="page-section active">
+      <h3>Génération automatique de l'emploi du temps</h3>
+      <form method="POST">
+        <button class="btn-generate" name="generateEDT">Générer EDT</button>
+      </form>
+      <p id="generateResult"><?php echo $generateResult; ?></p>
+    </section>
+
+    <section id="conflits" class="page-section">
+      <h3>Détection des conflits</h3>
+      <form method="POST">
+        <button class="btn-detect" name="detectConflicts">Analyser les Conflits</button>
+      </form>
+      <div id="conflictResult"><?php echo $conflictResult; ?></div>
+    </section>
+
+    <section id="ressources" class="page-section">
+      <h3>Optimisation des ressources</h3>
+      <form method="POST">
+        <button class="btn-optimize" name="optimizeResources">Optimiser les Ressources</button>
+      </form>
+      <div id="optimizeResult"><?php echo $optimizeResult; ?></div>
+    </section>
+
+    <section id="rapports" class="page-section">
+      <h3>Rapports</h3>
+      <p>Rapport d'examen complet sera disponible bientôt.</p>
+    </section>
+  </main>
+</div>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  }
+</script>
+
+</body>
+</html>
