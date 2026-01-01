@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Plateforme Examens – Administrateur</title>
+  <title>Plateforme d'Examens – Administrateur</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; }
     header { background: #004080; color: white; padding: 15px; display: flex; justify-content: space-between; }
@@ -28,7 +28,6 @@
 </header>
 
 <div class="container">
-
   <aside>
     <ul>
       <li onclick="showSection('generation')">⚙️ Génération EDT</li>
@@ -39,39 +38,34 @@
   </aside>
 
   <main>
-    <!-- GÉNÉRATION D'EDT -->
     <section id="generation" class="page-section active">
       <h3>Génération automatique de l'emploi du temps</h3>
-      <p>Cliquez sur le bouton ci-dessous pour générer l'emploi du temps.</p>
-      <button class="btn-generate" onclick="generateEDT()">Générer EDT</button>
-      <p id="generateResult"></p>
+      <form method="POST">
+        <button class="btn-generate" name="generateEDT">Générer EDT</button>
+      </form>
+      <p id="generateResult"><?php echo $generateResult; ?></p>
     </section>
 
-    <!-- DÉTECTION DE CONFLITS -->
     <section id="conflits" class="page-section">
       <h3>Détection des conflits</h3>
-      <p>Cliquez sur le bouton ci-dessous pour analyser les conflits dans l'emploi du temps.</p>
-      <button class="btn-detect" onclick="detectConflicts()">Analyser les Conflits</button>
-      <div id="conflictResult"></div>
+      <form method="POST">
+        <button class="btn-detect" name="detectConflicts">Analyser les Conflits</button>
+      </form>
+      <div id="conflictResult"><?php echo $conflictResult; ?></div>
     </section>
 
-    <!-- OPTIMISATION DES RESSOURCES -->
     <section id="ressources" class="page-section">
       <h3>Optimisation des ressources</h3>
-      <p>Cliquez sur le bouton ci-dessous pour optimiser les ressources.</p>
-      <button class="btn-optimize" onclick="optimizeResources()">Optimiser les Ressources</button>
-      <div id="optimizeResult"></div>
+      <form method="POST">
+        <button class="btn-optimize" name="optimizeResources">Optimiser les Ressources</button>
+      </form>
+      <div id="optimizeResult"><?php echo $optimizeResult; ?></div>
     </section>
 
-    <!-- RAPPORTS -->
     <section id="rapports" class="page-section">
-      <h3>Rapports et exportations</h3>
-      <ul>
-        <li>Rapport d'examen complet</li>
-        <li>Export PDF / Excel disponible</li>
-      </ul>
+      <h3>Rapports</h3>
+      <p>Rapport d'examen complet sera disponible bientôt.</p>
     </section>
-
   </main>
 </div>
 
@@ -79,18 +73,6 @@
   function showSection(id) {
     document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
     document.getElementById(id).classList.add("active");
-  }
-
-  function generateEDT() {
-    document.getElementById("generateResult").innerHTML = "🔄 Emploi du temps généré avec succès!";
-  }
-
-  function detectConflicts() {
-    document.getElementById("conflictResult").innerHTML = "🔍 Analyse des conflits terminée. Aucun conflit détecté.";
-  }
-
-  function optimizeResources() {
-    document.getElementById("optimizeResult").innerHTML = "⚙️ Ressources optimisées avec succès!";
   }
 </script>
 
