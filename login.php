@@ -1,4 +1,5 @@
 <?php
+set_time_limit(0);
 session_start();
 // Connexion à la base de données (Assurez-vous que le dossier 'includes' et le fichier 'connect.php' existent)
 require_once('includes/connect.php');
@@ -115,6 +116,12 @@ if (isset($_POST['submit_login'])) {
                         style="background-color: #2a1092ff; color: white; border: none; width: 100%; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.3s;">
                     Se Connecter <i class="fas fa-arrow-right" style="margin-left: 10px;"></i>
                 </button>
+                <div class="mt-5 d-flex justify-content-between align-items-center">
+        <p class="text-muted small mb-0">© 2025 Système de Gestion des Examens - Version 1.0</p>
+        <a href="../logout.php" class="btn-logout shadow-sm">
+            <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
+        </a>
+    </div>
             </form>
             
             <div style="margin-top: 25px; text-align: center;">

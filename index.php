@@ -1,191 +1,300 @@
+<?php
+// Empêcher le cache pour que les champs restent vides après une déconnexion
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+session_start();
+require_once('includes/connect.php');
+
+$erreur = null;
+
+if (isset($_POST['submit_login'])) {
+    $username = htmlspecialchars($_POST['username']);
+    $password = $_POST['password']; 
+
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE username = ? LIMIT 1");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
+
+        if ($user && $password === $user['password']) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'];
+            $_SESSION['nom'] = $user['nom'];
+
+            switch ($user['role']) {
+                case 'admin': header("Location: admin/gestion.php"); break;
+                case 'doyen': header("Location: doyen/stats.php"); break;
+                case 'professeur': header("Location: professeur/planning.php"); break;
+                case 'etudiant': header("Location: etudiant/recherche.php"); break;
+                default: header("Location: index.php");
+            }
+            exit();
+        } else {
+            $erreur = "Identifiants incorrects !";
+        }
+    } catch (PDOException $e) {
+        $erreur = "Erreur technique : " . $e->getMessage();
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Examens - Accueil</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Gestion des Examens - Connexion</title>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* RESET & BASE */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --text-light: #7f8c8d;
+            --white: #ffffff;
         }
 
-         body {
-    font-family: 'Poppins', sans-serif;
-    /* Mise à jour du chemin et ajout des réglages de taille */
-    background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.15)), url('index.avif'); /* Retrait du / si l'image est à côté du fichier */
-    
-    background-attachment: fixed;      /* L'image reste fixe lors du scroll */
-    background-size: cover;            /* L'image couvre tout l'écran */
-    background-position: center;       /* L'image est centrée */
-    background-repeat: no-repeat;      /* Évite les répétitions */
-    color: #2c3e50;
-    min-height: 100vh;
-}
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* HEADER */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('index.avif');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
         header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: white;
-            padding: 30px 20px;
+            background: rgba(44, 62, 80, 0.95);
+            backdrop-filter: blur(10px);
+            color: var(--white);
+            padding: 25px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
         header h1 {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             letter-spacing: 1px;
             text-transform: uppercase;
         }
 
-        /* CONTAINER */
         .main-content {
             flex: 1;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
 
-        .welcome-text {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .welcome-text h2 {
-            color: #2c3e50;
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-        }
-
-        .welcome-text p {
-            color: #7f8c8d;
-            font-size: 1.1rem;
-        }
-
-        /* GRID DES PROFILS */
-        .profile-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
+        .auth-card {
+            background: rgba(255, 255, 255, 0.98);
             width: 100%;
-            max-width: 1000px;
-        }
-
-        /* CARTES DE PROFIL */
-        .profile-card {
-            background: white;
-            padding: 40px 20px;
-            border-radius: 20px;
-            text-decoration: none;
+            max-width: 420px;
+            padding: 45px 35px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             text-align: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.02);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .profile-card i {
-            font-size: 3rem;
-            margin-bottom: 20px;
             transition: transform 0.3s ease;
         }
 
-        .profile-card h3 {
-            color: #2c3e50;
-            font-size: 1.2rem;
+        .auth-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .auth-card i.main-icon {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            width: 100px;
+            height: 100px;
+            line-height: 100px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .auth-card h2 {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 1.8rem;
+        }
+
+        .auth-card p {
+            color: var(--text-light);
+            margin-bottom: 35px;
+            font-size: 0.95rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            transition: 0.3s;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            border: 2px solid #edf2f7;
+            border-radius: 12px;
+            outline: none;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: 0.3s;
+            background: #f8fafc;
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent);
+            background: var(--white);
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+        }
+
+        .input-group input:focus + i {
+            color: var(--accent);
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 12px;
             font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
 
-        /* COULEURS SPECIFIQUES PAR PROFIL */
-        /* Étudiant */
-        .student { border-bottom: 5px solid #3498db; }
-        .student i { color: #3498db; }
-        
-        /* Professeur */
-        .teacher { border-bottom: 5px solid #2ecc71; }
-        .teacher i { color: #2ecc71; }
-        
-        /* Admin */
-        .admin { border-bottom: 5px solid #e74c3c; }
-        .admin i { color: #e74c3c; }
-        
-        /* Doyen */
-        .doyen { border-bottom: 5px solid #f1c40f; }
-        .doyen i { color: #f1c40f; }
-
-        /* EFFET HOVER */
-        .profile-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-            background: #fff;
+        .login-btn:hover {
+            background: var(--secondary);
+            box-shadow: 0 8px 15px rgba(44, 62, 80, 0.2);
         }
 
-        .profile-card:hover i {
-            transform: scale(1.1);
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: var(--danger);
+            text-decoration: none;
+            border: 2px solid #fee2e2;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        /* FOOTER */
+        .logout-btn:hover {
+            background: #fff5f5;
+            border-color: var(--danger);
+        }
+
+        .error-msg {
+            background: #fff5f5;
+            color: var(--danger);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 0.85rem;
+            border-left: 4px solid var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         footer {
             padding: 20px;
             text-align: center;
-            color: #95a5a6;
-            font-size: 0.9rem;
-        }
-
-        /* RESPONSIVE */
-        @media (max-width: 600px) {
-            .profile-grid {
-                grid-template-columns: 1fr;
-            }
+            color: rgba(255,255,255,0.8);
+            font-size: 0.85rem;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1><i class="fas fa-university me-2"></i> Université de Recherche</h1>
+        <h1><i class="fas fa-graduation-cap me-2"></i> Portail Académique</h1>
     </header>
 
     <main class="main-content">
-        <div class="welcome-text">
-            <h2>Portail de Gestion des Examens</h2>
-            <p>Choisissez votre profil pour accéder à votre espace personnalisé</p>
-        </div>
+        <div class="auth-card">
+            <i class="fas fa-shield-halved main-icon"></i>
+            <h2>Connexion</h2>
+            <p>Accédez à votre espace sécurisé</p>
 
-        <div class="profile-grid">
-            <a href="login.php?role=etudiant" class="profile-card student">
-                <i class="fas fa-user-graduate"></i>
-                <h3>Espace Étudiant</h3>
-            </a>
+            <?php if($erreur): ?>
+                <div class="error-msg">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <?php echo $erreur; ?>
+                </div>
+            <?php endif; ?>
 
-            <a href="login.php?role=professeur" class="profile-card teacher">
-                <i class="fas fa-chalkboard-teacher"></i>
-                <h3>Espace Professeur</h3>
-            </a>
+            <form method="POST" autocomplete="off">
+                <div class="input-group">
+                    <i class="fas fa-id-badge"></i>
+                    <input type="text" name="username" placeholder="Matricule / Identifiant" required autocomplete="off">
+                </div>
+                
+                <div class="input-group">
+                    <i class="fas fa-key"></i>
+                    <input type="password" name="password" placeholder="Mot de passe" required autocomplete="new-password">
+                </div>
 
-            <a href="login.php?role=admin" class="profile-card admin">
-                <i class="fas fa-user-shield"></i>
-                <h3>Espace Admin</h3>
-            </a>
-
-            <a href="login.php?role=doyen" class="profile-card doyen">
-                <i class="fas fa-user-tie"></i>
-                <h3>Espace Doyen</h3>
-            </a>
+                <div class="btn-container">
+                    <button type="submit" name="submit_login" class="login-btn">
+                        <span>Se connecter</span>
+                        <i class="fas fa-arrow-right-to-bracket"></i>
+                    </button>
+                    
+                    <a href="logout.php" class="logout-btn">
+                        <i class="fas fa-power-off"></i>
+                        <span>Quitter la session</span>
+                    </a>
+                </div>
+            </form>
         </div>
     </main>
 
     <footer>
-        &copy; 2025 Système de Gestion Académique - Tous droits réservés
+        &copy; 2026 Système de Gestion des Examens • Université de Recherche
     </footer>
 
 </body>
