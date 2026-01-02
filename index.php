@@ -23,9 +23,13 @@ if (isset($_POST['submit_login'])) {
             $_SESSION['username'] = $user['username'];
             $_SESSION['role'] = $user['role'];
             $_SESSION['nom'] = $user['nom'];
+            $_SESSION['dept_id'] = $user['dept_id'];
 
             switch ($user['role']) {
                 case 'admin': header("Location: admin/gestion.php"); break;
+                case 'chef_dep': // <-- On ajoute ce cas
+ header("Location: chefdepartement/chef.php"); 
+        break;
                 case 'doyen': header("Location: doyen/stats.php"); break;
                 case 'professeur': header("Location: professeur/planning.php"); break;
                 case 'etudiant': header("Location: etudiant/recherche.php"); break;
