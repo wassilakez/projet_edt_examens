@@ -23,6 +23,18 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
+CREATE TABLE `conflicts` (
+  `id` int(11) NOT NULL,
+  `type` varchar(100) NOT NULL,
+  `module` varchar(100) DEFAULT NULL,
+  `formation` varchar(100) DEFAULT NULL,
+  `reason` text DEFAULT NULL,
+  `severity` varchar(50) DEFAULT 'warning',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
 --
 -- Structure de la table `departements`
 --
@@ -193,6 +205,9 @@ INSERT INTO `utilisateurs` (`id`, `username`, `password`, `role`, `nom`, `prenom
 -- Index pour les tables déchargées
 --
 
+ALTER TABLE `conflicts`
+  ADD PRIMARY KEY (`id`);
+
 --
 -- Index pour la table `departements`
 --
@@ -248,6 +263,9 @@ ALTER TABLE `utilisateurs`
 --
 -- AUTO_INCREMENT pour les tables déchargées
 --
+
+ALTER TABLE `conflicts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `departements`
