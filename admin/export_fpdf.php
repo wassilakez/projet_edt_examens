@@ -58,9 +58,14 @@ $query = "SELECT e.*, m.nom as mod_nom, s.nom as salle_nom, f.nom as form_nom
 
 $result = $conn->query($query);
 
-while($row = $result->fetch_assoc()) {
+while($row = $result->fetch_assoc()) {    
+    $startTime = strtotime($row['heure_debut']);
+    $duration = isset($row['duree_minutes']) ? $row['duree_minutes'] : 90;
+    $endTime = date('H:i', $startTime + ($duration * 60));
+    $timeRange = substr($row['heure_debut'], 0, 5) . '-' . $endTime;
+    
     $pdf->Cell(35, 10, date('d/m/Y', strtotime($row['date_examen'])), 1, 0, 'C');
-    $pdf->Cell(25, 10, substr($row['heure_debut'], 0, 5), 1, 0, 'C');
+    $pdf->Cell(25, 10, $timeRange, 1, 0, 'C');
     $pdf->Cell(70, 10, utf8_decode($row['mod_nom']), 1, 0, 'L');
     $pdf->Cell(60, 10, utf8_decode($row['salle_nom']), 1, 1, 'L');
 }

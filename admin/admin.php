@@ -30,7 +30,16 @@ if (isset($_POST['add_user'])) {
     header("Location: admin.php#users"); exit;
 }
 if (isset($_POST['add_dept'])) { $conn->query("INSERT INTO departements (nom) VALUES ('".$_POST['nom']."')"); header("Location: admin.php#depts"); exit; }
-if (isset($_POST['add_room'])) { $conn->query("INSERT INTO lieu_examen (nom, capacite, type) VALUES ('".$_POST['nom']."', ".$_POST['cap'].", '".$_POST['type']."')"); header("Location: admin.php#rooms"); exit; }
+if (isset($_POST['add_room'])) { 
+    $type = $_POST['type'];
+    $cap = intval($_POST['cap']);    
+    $maxCap = ($type === 'Amphi') ? 300 : 20;
+    if ($cap > $maxCap) $cap = $maxCap;
+    if ($cap < 1) $cap = 1;
+    $conn->query("INSERT INTO lieu_examen (nom, capacite, type) VALUES ('".$_POST['nom']."', ".$cap.", '".$type."')"); 
+    header("Location: admin.php#rooms"); 
+    exit; 
+}
 if (isset($_POST['add_form'])) { $conn->query("INSERT INTO formations (nom, dept_id) VALUES ('".$_POST['nom']."', ".$_POST['dept_id'].")"); header("Location: admin.php#forms"); exit; }
 if (isset($_POST['add_mod']))  { $conn->query("INSERT INTO modules (nom, credits, formation_id) VALUES ('".$_POST['nom']."', ".$_POST['cred'].", ".$_POST['form_id'].")"); header("Location: admin.php#mods"); exit; }
 
@@ -41,7 +50,16 @@ if (isset($_POST['update_user'])) {
     header("Location: admin.php#users"); exit;
 }
 if (isset($_POST['update_dept'])) { $conn->query("UPDATE departements SET nom='".$_POST['nom']."' WHERE id=".$_POST['id']); header("Location: admin.php#depts"); exit; }
-if (isset($_POST['update_room'])) { $conn->query("UPDATE lieu_examen SET nom='".$_POST['nom']."', capacite=".$_POST['cap'].", type='".$_POST['type']."' WHERE id=".$_POST['id']); header("Location: admin.php#rooms"); exit; }
+if (isset($_POST['update_room'])) { 
+    $type = $_POST['type'];
+    $cap = intval($_POST['cap']);
+    $maxCap = ($type === 'Amphi') ? 300 : 20;
+    if ($cap > $maxCap) $cap = $maxCap;
+    if ($cap < 1) $cap = 1;
+    $conn->query("UPDATE lieu_examen SET nom='".$_POST['nom']."', capacite=".$cap.", type='".$type."' WHERE id=".$_POST['id']); 
+    header("Location: admin.php#rooms"); 
+    exit; 
+}
 if (isset($_POST['update_form'])) { $conn->query("UPDATE formations SET nom='".$_POST['nom']."', dept_id=".$_POST['dept_id']." WHERE id=".$_POST['id']); header("Location: admin.php#forms"); exit; }
 if (isset($_POST['update_mod']))  { $conn->query("UPDATE modules SET nom='".$_POST['nom']."', credits=".$_POST['cred'].", formation_id=".$_POST['form_id']." WHERE id=".$_POST['id']); header("Location: admin.php#mods"); exit; }
 
