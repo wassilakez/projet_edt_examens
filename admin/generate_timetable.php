@@ -96,7 +96,7 @@ class TimetableGenerator {
         $slots = $this->generateTimeSlots();
         
         if (empty($slots)) {
-            $this->addConflict('ERREUR_SYSTÈME', 'Système', '-', 'Aucun créneau disponible (weekends exclus)', 'critical');
+            $this->addConflict('ERREUR_SYSTÈME', 'Système', '-', 'Aucun créneau disponible (vendredis exclus)', 'critical');
             return $this->buildResult([], 'Aucun créneau horaire disponible.', $startTime);
         }
         
@@ -457,7 +457,7 @@ class TimetableGenerator {
         
         while ($current <= $end) {
             $dayOfWeek = $current->format('N');
-            if ($dayOfWeek < 6) {
+            if ($dayOfWeek != 5) {
                 foreach ($this->timeSlots as $time) {
                     $slots[] = [
                         'date' => $current->format('Y-m-d'),
