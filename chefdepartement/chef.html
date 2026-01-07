@@ -28,11 +28,12 @@
         
         .alert { padding: 12px; border-radius: 6px; font-size: 0.9rem; font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .alert-danger { background: #fee2e2; color: var(--danger); border-left: 5px solid var(--danger); }
-        .alert-info { background: #efbcb3; color: #de4d48; border-left: 5px solid var(--accent); }
+        /* Correction de la couleur info (Bleu plus lisible) */
+        .alert-info { background: #e0f2fe; color: #0369a1; border-left: 5px solid var(--accent); }
         
         .btn-valider { color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
         .btn-success { background: var(--success); }
-        .btn-disabled { background: #95a5a6; cursor: not-allowed; }
+        .btn-disabled { background: #95a5a6; cursor: not-allowed; opacity: 0.7; }
 
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -66,8 +67,9 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2>Emploi du Temps du Département</h2>
                 
-                <button class="btn-valider <?php echo $bloquer ? 'btn-disabled' : 'btn-success'; ?>" 
-                        <?php echo $bloquer ? 'disabled' : 'onclick="validerEDT()"'; ?>>
+                <button 
+                    class="btn-valider <?php echo $bloquer ? 'btn-disabled' : 'btn-success'; ?>" 
+                    <?php echo $bloquer ? 'disabled' : 'onclick="validerEDT()"'; ?>>
                     <i class="fas <?php echo $bloquer ? 'fa-lock' : 'fa-check-double'; ?>"></i>
                     <?php echo $bloquer ? "Validation bloquée" : "Valider l'EDT"; ?>
                 </button>
@@ -172,7 +174,6 @@
         function validerEDT() {
             if(confirm("Confirmez-vous la validation de l'emploi du temps pour votre département ?")) {
                 alert("Validation enregistrée ! L'EDT est désormais officiel.");
-                // Optionnel : redirection ou appel AJAX ici
             }
         }
     </script>
