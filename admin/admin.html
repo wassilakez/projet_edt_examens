@@ -78,8 +78,7 @@
         <a href="conflicts.php" class="btn btn-outline-warning w-100 text-start mb-2">
             <i class="bi bi-exclamation-triangle me-2"></i> Conflits & Charge
         </a>
-        <a href="logout.php" class="btn btn-outline-danger w-100 mt-5"><i class="bi bi-box-arrow-left"></i>
-            Déconnexion</a>
+        <a href="logout.php" class="btn btn-outline-danger w-100 mt-5"><i class="bi bi-box-arrow-left"></i> Déconnexion</a>
     </div>
 
     <div class="main">
@@ -530,7 +529,60 @@
             </form>
         </div>
     </div>
+<div class="modal fade" id="addDeptModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" method="POST">
+            <div class="modal-header bg-primary text-white"><h5>Département</h5></div>
+            <div class="modal-body">
+                <input type="hidden" name="id" id="ed_id">
+                <input type="text" name="nom" id="ed_nom" placeholder="Nom du département" class="form-control" required>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" name="add_dept" id="btn_add_dept" class="btn btn-primary">Ajouter</button>
+                <button type="submit" name="update_dept" id="btn_upd_dept" class="btn btn-warning" style="display:none;">Modifier</button>
+            </div>
+        </form>
+    </div>
+</div>
 
+<div class="modal fade" id="addFormModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" method="POST">
+            <div class="modal-header bg-primary text-white"><h5>Formation</h5></div>
+            <div class="modal-body">
+                <input type="hidden" name="id" id="ef_id">
+                <input type="text" name="nom" id="ef_nom" placeholder="Nom formation" class="form-control mb-2" required>
+                <select name="dept_id" id="ef_dept" class="form-select">
+                    <?php foreach($depts as $d): ?><option value="<?= $d['id'] ?>"><?= $d['nom'] ?></option><?php endforeach; ?>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" name="add_form" id="btn_add_form" class="btn btn-primary">Ajouter</button>
+                <button type="submit" name="update_form" id="btn_upd_form" class="btn btn-warning" style="display:none;">Modifier</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="addModModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" method="POST">
+            <div class="modal-header bg-primary text-white"><h5>Module</h5></div>
+            <div class="modal-body">
+                <input type="hidden" name="id" id="em_id">
+                <input type="text" name="nom" id="em_nom" placeholder="Nom module" class="form-control mb-2" required>
+                <input type="number" name="cred" id="em_cred" placeholder="Crédits" class="form-control mb-2">
+                <select name="form_id" id="em_form" class="form-select">
+                    <?php foreach($forms as $f): ?><option value="<?= $f['id'] ?>"><?= $f['nom'] ?></option><?php endforeach; ?>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" name="add_mod" id="btn_add_mod" class="btn btn-primary">Ajouter</button>
+                <button type="submit" name="update_mod" id="btn_upd_mod" class="btn btn-warning" style="display:none;">Modifier</button>
+            </div>
+        </form>
+    </div>
+</div>
     <div class="modal fade" id="addExamModal" tabindex="-1">
         <div class="modal-dialog">
             <form class="modal-content" method="POST">
@@ -722,6 +774,7 @@
 
 
         function editRoom(r) {
+            
             document.getElementById('er_id').value = r.id;
             document.getElementById('er_nom').value = r.nom;
             document.getElementById('er_type').value = r.type;
@@ -729,7 +782,59 @@
             updateCapacityLimit('edit');
             new bootstrap.Modal(document.getElementById('editRoomModal')).show();
         }
+// MODIFIER UTILISATEUR
+function editUser(u) {
+    const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+    const form = document.querySelector('#addUserModal form');
+    form.querySelector('input[name="nom"]').value = u.nom;
+    form.querySelector('input[name="prenom"]').value = u.prenom;
+    form.querySelector('input[name="user"]').value = u.username;
+    form.querySelector('input[name="password"]').value = u.password;
+    form.querySelector('select[name="role"]').value = u.role;
+    form.querySelector('select[name="dept_id"]').value = u.dept_id;
+    form.querySelector('select[name="formation_id"]').value = u.formation_id;
+    
+    // On ajoute un champ ID caché pour la modification
+    if(!document.getElementById('edit_user_id')){
+        form.insertAdjacentHTML('beforeend', `<input type="hidden" name="id" id="edit_user_id" value="${u.id}">`);
+    } else {
+        document.getElementById('edit_user_id').value = u.id;
+    }
+    
+    form.querySelector('button[name="add_user"]').name = "update_user";
+    form.querySelector('button[name="update_user"]').textContent = "Modifier";
+    modal.show();
+}
 
+// MODIFIER DÉPARTEMENT
+function editDept(d) {
+    document.getElementById('ed_id').value = d.id;
+    document.getElementById('ed_nom').value = d.nom;
+    document.getElementById('btn_add_dept').style.display = 'none';
+    document.getElementById('btn_upd_dept').style.display = 'block';
+    new bootstrap.Modal(document.getElementById('addDeptModal')).show();
+}
+
+// MODIFIER FORMATION
+function editForm(f) {
+    document.getElementById('ef_id').value = f.id;
+    document.getElementById('ef_nom').value = f.nom;
+    document.getElementById('ef_dept').value = f.dept_id;
+    document.getElementById('btn_add_form').style.display = 'none';
+    document.getElementById('btn_upd_form').style.display = 'block';
+    new bootstrap.Modal(document.getElementById('addFormModal')).show();
+}
+
+// MODIFIER MODULE
+function editMod(m) {
+    document.getElementById('em_id').value = m.id;
+    document.getElementById('em_nom').value = m.nom;
+    document.getElementById('em_cred').value = m.credits || 0;
+    document.getElementById('em_form').value = m.formation_id;
+    document.getElementById('btn_add_mod').style.display = 'none';
+    document.getElementById('btn_upd_mod').style.display = 'block';
+    new bootstrap.Modal(document.getElementById('addModModal')).show();
+}
 
         function updateCapacityLimit(mode) {
             const typeSelect = document.getElementById(mode === 'add' ? 'addRoomType' : 'er_type');
