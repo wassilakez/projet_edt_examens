@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Espace Chef de Département</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; --danger: #e74c3c; --success: #2ecc71; --bg: #f4f7f6; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); display: flex; margin: 0; min-height: 100vh; }
+        
+        /* Sidebar */
+        aside { width: 280px; background: var(--primary); color: white; padding: 20px; flex-shrink: 0; }
+        aside h2 { font-size: 1.1rem; text-align: center; padding-bottom: 20px; border-bottom: 1px solid #3e5871; }
+        aside ul { list-style: none; margin-top: 20px; padding: 0; }
+        aside li { padding: 15px; cursor: pointer; border-radius: 8px; margin-bottom: 10px; transition: 0.3s; }
+        aside li:hover, aside li.active { background: var(--accent); }
+        
+        /* Main */
+        main { flex: 1; padding: 40px; overflow-y: auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        section { display: none; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        section.active { display: block; animation: fadeIn 0.4s; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f8f9fa; padding: 15px; text-align: left; color: var(--primary); border-bottom: 2px solid #dee2e6; }
+        td { padding: 15px; border-bottom: 1px solid #eee; }
+        
+        .alert { padding: 12px; border-radius: 6px; font-size: 0.9rem; font-weight: 500; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .alert-danger { background: #fee2e2; color: var(--danger); border-left: 5px solid var(--danger); }
+        /* Correction de la couleur info (Bleu plus lisible) */
+        .alert-info { background: #e0f2fe; color: #0369a1; border-left: 5px solid var(--accent); }
+        
+        .btn-valider { color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .btn-success { background: var(--success); }
+        .btn-disabled { background: #95a5a6; cursor: not-allowed; opacity: 0.7; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <h2><i class="fas fa-user-tie"></i> Direction Dept</h2>
+        <ul>
+            <li class="active" onclick="tab('planning', this)"><i class="fas fa-calendar-alt"></i> Planning (EDT)</li>
+            <li onclick="tab('stats', this)"><i class="fas fa-chart-pie"></i> Statistiques</li>
+            <li onclick="tab('conflits', this)"><i class="fas fa-exclamation-triangle"></i> Conflits</li>
+        </ul>
+        <div style="margin-top: 50px; text-align: center;">
+            <a href="../logout.php" style="color: #ff7675; text-decoration: none;"><i class="fas fa-power-off"></i> Déconnexion</a>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <h1>Tableau de bord - Chef</h1>
+            <span>Bienvenue, <strong>M. <?php echo htmlspecialchars($nom_chef); ?></strong></span>
+        </header>
+
+        <?php 
+            $surcharges_list = array_filter($stats, function($s) { return $s['nb_etudiants'] > 20; });
+            $bloquer = !empty($conflits_dates) || !empty($conflits_profs) || !empty($surcharges_list); 
+        ?>
+
+        <section id="planning" class="active">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Emploi du Temps du Département</h2>
+                
+                <button 
+                    class="btn-valider <?php echo $bloquer ? 'btn-disabled' : 'btn-success'; ?>" 
+                    <?php echo $bloquer ? 'disabled' : 'onclick="validerEDT()"'; ?>>
+                    <i class="fas <?php echo $bloquer ? 'fa-lock' : 'fa-check-double'; ?>"></i>
+                    <?php echo $bloquer ? "Validation bloquée" : "Valider l'EDT"; ?>
+                </button>
+            </div>
+
+            <?php if($bloquer): ?>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> 
+                    Le planning contient des conflits critiques. Veuillez les corriger dans l'onglet <strong>Conflits</strong> avant de valider.
+                </div>
+            <?php endif; ?>
+
+            <table>
+                <thead>
+                    <tr><th>Date & Heure</th><th>Formation</th><th>Module</th><th>Salle</th><th>Surveillant</th></tr>
+                </thead>
+                <tbody>
+                    <?php foreach($exams as $e): ?>
+                    <tr>
+                        <td>
+                            <?php 
+                                echo date('d/m/Y', strtotime($e['date_examen'])) . " à " . 
+                                     date('H:i', strtotime($e['heure_debut'])); 
+                            ?>
+                        </td>
+                        <td><?php echo htmlspecialchars($e['formation_nom']); ?></td>
+                        <td><?php echo htmlspecialchars($e['module_nom']); ?></td>
+                        <td><?php echo htmlspecialchars($e['salle_nom']); ?></td>
+                        <td><i class="fas fa-user-check"></i> <?php echo htmlspecialchars($e['prof_nom']); ?></td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="stats">
+            <h2>Indicateurs par Formation (KPIs)</h2>
+            <table>
+                <thead>
+                    <tr><th>Nom Formation</th><th>Nb Modules</th><th>Étudiants Inscrits</th></tr>
+                </thead>
+                <tbody>
+                    <?php foreach($stats as $s): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($s['nom']); ?></td>
+                        <td><?php echo $s['nb_modules']; ?> modules</td>
+                        <td>
+                            <strong style="<?php echo ($s['nb_etudiants'] > 20) ? 'color:var(--danger);' : ''; ?>">
+                                <?php echo $s['nb_etudiants']; ?>
+                            </strong> inscrits
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="conflits">
+            <h2><i class="fas fa-shield-virus"></i> Analyse des Contraintes Critiques</h2>
+            
+            <?php if(!$bloquer): ?>
+                <div style="background: #e8f5e9; color: #2e7d32; padding: 30px; border-radius: 10px; text-align: center;">
+                    <i class="fas fa-check-circle fa-4x"></i>
+                    <p style="font-size: 1.2rem; margin-top: 15px;"><strong>Tout est conforme !</strong></p>
+                    <p>Le planning respecte les limites de salles (20), d'étudiants (1/jour) et de profs (3/jour).</p>
+                </div>
+            <?php else: ?>
+                
+                <?php foreach($conflits_dates as $cd): ?>
+                    <div class="alert alert-danger">
+                        <i class="fas fa-user-graduate"></i> 
+                        <strong>Conflit Étudiant :</strong> La formation <u><?php echo htmlspecialchars($cd['formation_nom']); ?></u> a <?php echo $cd['nb_examens_jour']; ?> examens le <?php echo date('d/m/Y', strtotime($cd['date_examen'])); ?>.
+                    </div>
+                <?php endforeach; ?>
+
+                <?php foreach($conflits_profs as $cp): ?>
+                    <div class="alert alert-danger">
+                        <i class="fas fa-chalkboard-teacher"></i> 
+                        <strong>Conflit Professeur :</strong> M. <?php echo htmlspecialchars($cp['prof_nom']); ?> surveille <?php echo $cp['nb_surveillances']; ?> examens le <?php echo date('d/m/Y', strtotime($cp['date_examen'])); ?> (Max 3).
+                    </div>
+                <?php endforeach; ?>
+
+                <?php foreach($surcharges_list as $s): ?>
+                    <div class="alert alert-danger">
+                        <i class="fas fa-users"></i> 
+                        <strong>Surcharge Salle :</strong> La formation <u><?php echo htmlspecialchars($s['nom']); ?></u> compte <?php echo $s['nb_etudiants']; ?> étudiants (Limite : 20 par salle).
+                    </div>
+                <?php endforeach; ?>
+
+            <?php endif; ?>
+        </section>
+    </main>
+
+    <script>
+        function tab(id, el) {
+            document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('aside li').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            el.classList.add('active');
+        }
+
+        function validerEDT() {
+            if(confirm("Confirmez-vous la validation de l'emploi du temps pour votre département ?")) {
+                alert("Validation enregistrée ! L'EDT est désormais officiel.");
+            }
+        }
+    </script>
+</body>
+</html>

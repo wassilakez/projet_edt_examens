@@ -1,0 +1,8 @@
+/vendor/
+/php/
+/apache/
+/mysql/
+/tmp/
+*.log
+*.tmp
+.DS_Store

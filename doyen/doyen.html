@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Plateforme Examens – Vue Doyen</title>
+<style>
+body{font-family:Arial;margin:0;background:#f4f4f4}
+header{background:#004080;color:#fff;padding:15px;display:flex;justify-content:space-between}
+.container{display:flex}
+aside{width:230px;background:#ddd;padding:10px}
+aside ul{list-style:none;padding:0}
+aside li{padding:10px;margin:5px 0;background:#004080;color:white;cursor:pointer;border-radius:5px}
+aside li:hover{background:#0066cc}
+main{flex:1;padding:20px}
+section{display:none;background:#fff;padding:20px;border-radius:8px;box-shadow:0 0 5px rgba(0,0,0,.2)}
+section.active{display:block}
+.kpis{display:flex;gap:15px;margin-top:15px}
+.card{flex:1;background:#eee;padding:15px;text-align:center;border-radius:8px}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border:1px solid #ccc;padding:8px;text-align:center}
+.status-valid{color:green;font-weight:bold}
+.status-wait{color:orange;font-weight:bold}
+.status-reject{color:red;font-weight:bold}
+.actions button{margin:5px;padding:6px 12px;border:none;border-radius:5px;cursor:pointer}
+.btn-fix{background:#ffc107}
+.btn-validate{background:#28a745;color:white}
+.btn-reject{background:#dc3545;color:white}
+h4,h5,h6{margin:5px 0;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<header>
+<h2>Faculté des Sciences – Examens</h2>
+<div>Doyen | Déconnexion</div>
+</header>
+
+<div class="container">
+<aside>
+<ul>
+<li onclick="showSection('edt')">📅 Emplois du temps</li>
+</ul>
+</aside>
+
+<main>
+<section id="edt" class="active">
+<h3>Emplois du temps des examens</h3>
+<div id="departementsContainer"></div>
+</section>
+</main>
+</div>
+
+<script>
+function showSection(id){
+  document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function chargerEDT(){
+  fetch("get_examens.php")
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById("departementsContainer");
+      container.innerHTML = "";
+      const deps = {};
+
+      // Organiser les données
+      data.forEach(e => {
+        if(!deps[e.departement]) deps[e.departement]={};
+        if(!deps[e.departement][e.niveau]) deps[e.departement][e.niveau]={};
+        if(!deps[e.departement][e.niveau][e.specialite]) deps[e.departement][e.niveau][e.specialite]=[];
+        deps[e.departement][e.niveau][e.specialite].push(e);
+      });
+
+      for(const dep in deps){
+        let depHTML = `<h4 onclick="toggleVisibility('dep-${dep}')">📂 ${dep}</h4>`;
+        depHTML += `<div id="dep-${dep}" style="display:none;padding-left:20px;">`;
+        for(const niv in deps[dep]){
+          depHTML += `<h5 onclick="toggleVisibility('niv-${dep}-${niv}')" style="color:#0066cc;">🎓 ${niv}</h5>`;
+          depHTML += `<div id="niv-${dep}-${niv}" style="display:none;padding-left:20px;">`;
+          for(const spec in deps[dep][niv]){
+            depHTML += `<h6 onclick="toggleVisibility('spec-${dep}-${niv}-${spec}')" style="color:#008080;">🗂️ ${spec}</h6>`;
+            depHTML += `<div id="spec-${dep}-${niv}-${spec}" style="display:none;padding-left:20px;">`;
+
+            // Table
+            depHTML += `<table>
+              <thead>
+                <tr>
+                  <th>Module</th>
+                  <th>Date</th>
+                  <th>Salle</th>
+                  <th>Surveillant</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>`;
+            deps[dep][niv][spec].forEach(e=>{
+              let cls = e.statut==="VALIDE"?"status-valid":e.statut==="REJETE"?"status-reject":"status-wait";
+              let txt = e.statut==="VALIDE"?"🟢 Validé":e.statut==="REJETE"?"🔴 Rejeté":"🟡 En attente";
+              depHTML += `<tr>
+                <td>${e.module||'-'}</td>
+                <td>${e.date_examen||'-'}</td>
+                <td>${e.salle||'-'}</td>
+                <td>${e.surveillant||'-'}</td>
+                <td class="${cls}">${txt}</td>
+              </tr>`;
+            });
+            depHTML += `</tbody></table>`;
+
+            // Actions
+            depHTML += `<div class="actions">
+              <button onclick="setStatusSpecialite('${dep}','${niv}','${spec}','wait')" class="btn-fix">🟡 Ajustement</button>
+              <button onclick="setStatusSpecialite('${dep}','${niv}','${spec}','valid')" class="btn-validate">✅ Valider</button>
+              <button onclick="setStatusSpecialite('${dep}','${niv}','${spec}','reject')" class="btn-reject">❌ Rejeter</button>
+            </div>`;
+
+            depHTML += `</div>`;
+          }
+          depHTML += `</div>`;
+        }
+        depHTML += `</div>`;
+        container.innerHTML += depHTML;
+      }
+    })
+    .catch(err=>console.error("Erreur chargement EDT:",err));
+}
+
+function toggleVisibility(id){
+  const el=document.getElementById(id);
+  el.style.display = (el.style.display==='none')?'block':'none';
+}
+
+function setStatusSpecialite(dep,niv,spec,type){
+  let statut = type==='valid'?'VALIDE':type==='reject'?'REJETE':'EN_ATTENTE';
+  fetch("update_status_specialite.php",{
+    method:"POST",
+    headers:{"Content-Type":"application/x-www-form-urlencoded"},
+    body:`departement=${encodeURIComponent(dep)}&niveau=${encodeURIComponent(niv)}&specialite=${encodeURIComponent(spec)}&statut=${encodeURIComponent(statut)}`
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    if(data.success){
+      chargerEDT();
+      alert(`✔ Statut appliqué pour ${niv} - ${spec}`);
+    } else {
+      alert("❌ Erreur: "+(data.msg||""));
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded",chargerEDT);
+</script>
+
+</body>
+</html>

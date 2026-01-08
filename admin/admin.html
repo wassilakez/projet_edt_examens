@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Gestion Totale</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: #1a1d20;
+            color: white;
+            position: fixed;
+            width: 250px;
+            z-index: 100;
+        }
+
+        .main {
+            margin-left: 260px;
+            padding: 20px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .card-dash {
+            border: none;
+            border-radius: 10px;
+            color: white;
+            padding: 20px;
+            transition: 0.3s;
+        }
+
+        .card-dash:hover {
+            transform: translateY(-5px);
+        }
+
+        .table-responsive {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <div class="sidebar p-3 shadow">
+        <h4 class="text-center text-warning fw-bold">ADMIN PANEL</h4>
+        <hr>
+        <button id="btn-dash" class="btn btn-dark w-100 text-start mb-2" onclick="show('dash')"><i
+                class="bi bi-speedometer2 me-2"></i> Dashboard</button>
+        <button id="btn-users" class="btn btn-dark w-100 text-start mb-2" onclick="show('users')"><i
+                class="bi bi-people me-2"></i>
+            Utilisateurs</button>
+        <button id="btn-depts" class="btn btn-dark w-100 text-start mb-2" onclick="show('depts')"><i
+                class="bi bi-diagram-3 me-2"></i>
+            Départements</button>
+        <button id="btn-rooms" class="btn btn-dark w-100 text-start mb-2" onclick="show('rooms')"><i
+                class="bi bi-building me-2"></i>
+            Salles</button>
+        <button id="btn-forms" class="btn btn-dark w-100 text-start mb-2" onclick="show('forms')"><i
+                class="bi bi-mortarboard me-2"></i> Formations</button>
+        <button id="btn-mods" class="btn btn-dark w-100 text-start mb-2" onclick="show('mods')"><i
+                class="bi bi-book me-2"></i>
+            Modules</button>
+        <button id="btn-exams" class="btn btn-warning w-100 text-start mb-2 py-2 fw-bold text-dark shadow-sm"
+            onclick="show('exams')">
+            <i class="bi bi-calendar-check me-2"></i> PLANIFICATION
+        </button>
+        <a href="conflicts.php" class="btn btn-outline-warning w-100 text-start mb-2">
+            <i class="bi bi-exclamation-triangle me-2"></i> Conflits & Charge
+        </a>
+        <a href="logout.php" class="btn btn-outline-danger w-100 mt-5"><i class="bi bi-box-arrow-left"></i> Déconnexion</a>
+    </div>
+
+    <div class="main">
+
+        <div id="dash" class="section active">
+            <h3 class="mb-4">Vue d'ensemble</h3>
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="card-dash bg-primary">
+                        <h6>Utilisateurs</h6>
+                        <h2>
+                            <?= $total_users ?>
+                        </h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card-dash bg-success">
+                        <h6>Professeurs</h6>
+                        <h2>
+                            <?= $total_profs ?>
+                        </h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card-dash bg-info">
+                        <h6>Étudiants</h6>
+                        <h2>
+                            <?= $total_etud ?>
+                        </h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card-dash bg-info">
+                        <h6>Chef departement</h6>
+                        <h2>
+                            <?= $total_chef ?>
+                        </h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card-dash bg-warning text-dark">
+                        <h6>Salles</h6>
+                        <h2>
+                            <?= $total_rooms ?>
+                        </h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card-dash bg-warning text-dark">
+                        <h6>Modules</h6>
+                        <h2>
+                            <?= $total_mods ?>
+                        </h2>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card-dash bg-warning text-dark">
+                        <h6>Formations</h6>
+                        <h2>
+                            <?= $total_form ?>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="users" class="section">
+            <div class="d-flex justify-content-between mb-3 align-items-center">
+                <h3>Gestion des Utilisateurs</h3>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">+ Ajouter</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Username</th>
+                            <th>Passward</th>
+                            <th>Rôle</th>
+                            <th>Departement</th>
+                            <th>Formation</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($users as $u): ?>
+                        <tr>
+                            <td>
+                                <?= $u['nom'] ?>
+                            </td>
+                            <td>
+                                <?= $u['prenom'] ?>
+                            </td>
+                            <td>
+                                <?= $u['username'] ?>
+                            </td>
+                            <td><span class="badge bg-secondary">
+                                    <?= $u['password'] ?>
+                                </span></td>
+                            <td><span class="badge bg-secondary">
+                                    <?= $u['role'] ?>
+                                </span></td>
+                            <td>
+                                <?= $u['dept_nom'] ?? 'Aucun'?>
+                            </td>
+                            <td>
+                                <?= $u['formation_nom'] ?? 'Aucun' ?>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick='editUser(<?= json_encode($u) ?>)'><i
+                                        class="bi bi-pencil"></i></button>
+                                <a href="admin.php?del_user=<?= $u['id'] ?>" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Supprimer cet utilisateur ?')"><i
+                                        class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="depts" class="section">
+            <div class="d-flex justify-content-between mb-3 align-items-center">
+                <h3>Départements</h3><button class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#addDeptModal">+ Nouveau</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom du Département</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($depts as $d): ?>
+                        <tr>
+                            <td>
+                                <?= $d['nom'] ?>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick='editDept(<?= json_encode($d) ?>)'><i
+                                        class="bi bi-pencil"></i></button>
+                                <a href="admin.php?del_dept=<?= $d['id'] ?>" class="btn btn-sm btn-danger"><i
+                                        class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="rooms" class="section">
+            <div class="d-flex justify-content-between mb-3">
+                <h3>Salles d'examen</h3><button class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#addRoomModal">+ Nouvelle</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Capacité</th>
+                            <th>Type</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($rooms as $r): ?>
+                        <tr>
+                            <td>
+                                <?= $r['nom'] ?>
+                            </td>
+                            <td>
+                                <?= $r['capacite'] ?> places
+                            </td>
+                            <td>
+                                <?= $r['type'] ?>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick='editRoom(<?= json_encode($r) ?>)'><i
+                                        class="bi bi-pencil"></i></button>
+                                <a href="admin.php?del_room=<?= $r['id'] ?>" class="btn btn-sm btn-danger"><i
+                                        class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="forms" class="section">
+            <div class="d-flex justify-content-between mb-3">
+                <h3>Formations</h3><button class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#addFormModal">+ Nouvelle</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Formation</th>
+                            <th>Département</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($forms as $f): ?>
+                        <tr>
+                            <td>
+                                <?= $f['nom'] ?>
+                            </td>
+                            <td>
+                                <?= $f['dept_nom'] ?>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick='editForm(<?= json_encode($f) ?>)'><i
+                                        class="bi bi-pencil"></i></button>
+                                <a href="admin.php?del_form=<?= $f['id'] ?>" class="btn btn-sm btn-danger"><i
+                                        class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="mods" class="section">
+            <div class="d-flex justify-content-between mb-3">
+                <h3>Modules</h3><button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModModal">+
+                    Nouveau</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Module</th>
+                            <th>Formation</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($mods as $m): ?>
+                        <tr>
+                            <td>
+                                <?= $m['nom'] ?>
+                            </td>
+                            <td>
+                                <?= $m['form_nom'] ?>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick='editMod(<?= json_encode($m) ?>)'><i
+                                        class="bi bi-pencil"></i></button>
+                                <a href="admin.php?del_mod=<?= $m['id'] ?>" class="btn btn-sm btn-danger"><i
+                                        class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="exams" class="section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3><i class="bi bi-calendar-event text-warning"></i> Calendrier des Examens</h3>
+                <button class="btn btn-warning fw-bold shadow-sm" data-bs-toggle="modal"
+                    data-bs-target="#addExamModal">+ Nouvelle Planification</button>
+            </div>
+            <div class="card shadow-sm mb-4 border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-magic me-2"></i>Génération Automatique des Emplois du Temps</h5>
+                </div>
+                <div class="card-body bg-light">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Date début :</label>
+                            <input type="date" id="genStartDate" class="form-control border-success"
+                                value="<?= date('Y-m-d') ?>">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Date fin :</label>
+                            <input type="date" id="genEndDate" class="form-control border-success"
+                                value="<?= date('Y-m-d', strtotime('+2 weeks')) ?>">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Département (optionnel) :</label>
+                            <select id="genDeptFilter" class="form-select border-success">
+                                <option value="">-- Tous les départements --</option>
+                                <?php foreach($depts as $d): ?>
+                                <option value="<?= $d['id'] ?>">
+                                    <?= $d['nom'] ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button onclick="generateTimetable()" class="btn btn-success w-100 fw-bold shadow-sm"
+                                id="btnGenerate">
+                                <i class="bi bi-lightning-charge me-1"></i> Générer Automatiquement
+                            </button>
+                        </div>
+                        <div class="col-md-2">
+                            <button onclick="clearTimetable()" class="btn btn-outline-danger w-100" id="btnClear">
+                                <i class="bi bi-trash me-1"></i> Effacer Période
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <div id="genProgress" class="mt-3" style="display:none;">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-success me-2" role="status"></div>
+                            <span>Génération en cours...</span>
+                        </div>
+                    </div>
+
+                    <div id="genResult" class="mt-3" style="display:none;"></div>
+
+
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <!-- <i class="bi bi-info-circle me-1"></i>
+                            <strong>Contraintes appliquées :</strong>
+                            Max 1 examen/jour par étudiant •
+                            Max 3 examens/jour par professeur •
+                            Priorité département pour surveillance •
+                            Respect capacité salles -->
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="card shadow-sm mb-4 border-warning">
+                <div class="card-body bg-white">
+                    <div class="row align-items-end">
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold">Filtrer par formation :</label>
+                            <select id="filterFormation" class="form-select border-warning"
+                                onchange="filterExamsByFormation()">
+                                <option value="all">-- Toutes les formations --</option>
+                                <?php foreach($forms as $f): ?>
+                                <option value="<?= $f['id'] ?>" data-nom="<?= $f['nom'] ?>">
+                                    <?= $f['nom'] ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button onclick="printSpecificFormation()" class="btn btn-danger w-100 fw-bold">
+                                <i class="bi bi-file-earmark-pdf"></i> Imprimer le PDF (Filtre)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle" id="tableExams">
+                    <thead class="table-warning">
+                        <tr>
+                            <th>Date & Heure</th>
+                            <th>Formation</th>
+                            <th>Module</th>
+                            <th>Salle</th>
+                            <th>Professeur</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($exams as $e): ?>
+                        <tr class="exam-row" data-formation="<?= $e['form_nom'] ?>">
+                            <td><strong>
+                                    <?= date('d/m/Y', strtotime($e['date_examen'])) ?>
+                                </strong><br>
+                                <small class="text-muted">
+                                    <?= substr($e['heure_debut'], 0, 5) ?> -
+                                    <?= date('H:i', strtotime($e['heure_debut']) + ($e['duree_minutes'] ?? 120) * 60) ?>
+                                </small>
+                            </td>
+                            <td><span class="badge bg-info text-dark">
+                                    <?= $e['form_nom'] ?>
+                                </span></td>
+                            <td><strong>
+                                    <?= $e['mod_nom'] ?>
+                                </strong></td>
+                            <td>
+                                <?= $e['salle_nom'] ?>
+                            </td>
+                            <td>
+                                <?= $e['prof_nom'] ?>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-warning"
+                                    onclick='editExam(<?= json_encode($e) ?>)'><i class="bi bi-pencil"></i></button>
+                                <a href="admin.php?del_exam=<?= $e['id'] ?>" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Annuler cet examen ?')"><i class="bi bi-trash"></i></a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="addUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content" method="POST">
+                <div class="modal-header bg-primary text-white">
+                    <h5>Nouvel Utilisateur</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="text" name="nom" placeholder="Nom" class="form-control mb-2" required>
+                    <input type="text" name="prenom" placeholder="Prénom" class="form-control mb-2" required>
+                    <input type="text" name="user" placeholder="Username" class="form-control mb-2" required>
+                    <input type="password" name="password" placeholder="Mot de passe" class="form-control mb-2"
+                        required>
+                    <select name="role" class="form-select mb-2">
+                        <option value="etudiant">Étudiant</option>
+                        <option value="professeur">Professeur</option>
+                        <option value="chef_dep">Chef de Département</option>
+                    </select>
+                    <label>Département :</label>
+                    <select name="dept_id" class="form-select mb-2">
+                        <?php foreach($depts as $d): ?>
+                        <option value="<?= $d['id'] ?>">
+                            <?= $d['nom'] ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <label>Formation (si étudiant) :</label>
+                    <select name="formation_id" class="form-select">
+                        <?php foreach($forms as $f): ?>
+                        <option value="<?= $f['id'] ?>">
+                            <?= $f['nom'] ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="modal-footer"><button type="submit" name="add_user"
+                        class="btn btn-primary w-100">Ajouter</button></div>
+            </form>
+        </div>
+    </div>
+<div class="modal fade" id="addDeptModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" method="POST">
+            <div class="modal-header bg-primary text-white"><h5>Département</h5></div>
+            <div class="modal-body">
+                <input type="hidden" name="id" id="ed_id">
+                <input type="text" name="nom" id="ed_nom" placeholder="Nom du département" class="form-control" required>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" name="add_dept" id="btn_add_dept" class="btn btn-primary">Ajouter</button>
+                <button type="submit" name="update_dept" id="btn_upd_dept" class="btn btn-warning" style="display:none;">Modifier</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="addFormModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" method="POST">
+            <div class="modal-header bg-primary text-white"><h5>Formation</h5></div>
+            <div class="modal-body">
+                <input type="hidden" name="id" id="ef_id">
+                <input type="text" name="nom" id="ef_nom" placeholder="Nom formation" class="form-control mb-2" required>
+                <select name="dept_id" id="ef_dept" class="form-select">
+                    <?php foreach($depts as $d): ?><option value="<?= $d['id'] ?>"><?= $d['nom'] ?></option><?php endforeach; ?>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" name="add_form" id="btn_add_form" class="btn btn-primary">Ajouter</button>
+                <button type="submit" name="update_form" id="btn_upd_form" class="btn btn-warning" style="display:none;">Modifier</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="addModModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form class="modal-content" method="POST">
+            <div class="modal-header bg-primary text-white"><h5>Module</h5></div>
+            <div class="modal-body">
+                <input type="hidden" name="id" id="em_id">
+                <input type="text" name="nom" id="em_nom" placeholder="Nom module" class="form-control mb-2" required>
+                <input type="number" name="cred" id="em_cred" placeholder="Crédits" class="form-control mb-2">
+                <select name="form_id" id="em_form" class="form-select">
+                    <?php foreach($forms as $f): ?><option value="<?= $f['id'] ?>"><?= $f['nom'] ?></option><?php endforeach; ?>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" name="add_mod" id="btn_add_mod" class="btn btn-primary">Ajouter</button>
+                <button type="submit" name="update_mod" id="btn_upd_mod" class="btn btn-warning" style="display:none;">Modifier</button>
+            </div>
+        </form>
+    </div>
+</div>
+    <div class="modal fade" id="addExamModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content" method="POST">
+                <div class="modal-header bg-warning">
+                    <h5>Nouvelle Planification d'Examen</h5>
+                </div>
+                <div class="modal-body">
+                    <label>Module :</label>
+                    <select name="module_id" class="form-select mb-2" required>
+                        <?php foreach($mods as $m): ?>
+                        <option value="<?= $m['id'] ?>">
+                            <?= $m['nom'] ?> (
+                            <?= $m['form_nom'] ?>)
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <label>Salle :</label>
+                    <select name="salle_id" class="form-select mb-2" required>
+                        <?php foreach($rooms as $r): ?>
+                        <option value="<?= $r['id'] ?>">
+                            <?= $r['nom'] ?> (
+                            <?= $r['capacite'] ?> pl)
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <label>Professeur Surveillant :</label>
+                    <select name="prof_id" class="form-select mb-2" required>
+                        <?php foreach($profs as $p): ?>
+                        <option value="<?= $p['id'] ?>">
+                            <?= $p['nom'] ?>
+                            <?= $p['prenom'] ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="row">
+                        <div class="col-6"><label>Date :</label><input type="date" name="date_examen"
+                                class="form-control" required></div>
+                        <div class="col-6"><label>Heure :</label><input type="time" name="heure_debut"
+                                class="form-control" required></div>
+                    </div>
+                    <input type="hidden" name="duree_minutes" value="90">
+                </div>
+                <div class="modal-footer"><button type="submit" name="add_exam"
+                        class="btn btn-warning w-100 fw-bold">Enregistrer l'Examen</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editExamModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content" method="POST">
+                <input type="hidden" name="id" id="ee_id">
+                <div class="modal-header bg-warning">
+                    <h5>Modifier l'Examen</h5>
+                </div>
+                <div class="modal-body">
+                    <label>Module :</label><select name="module_id" id="ee_module" class="form-select mb-2">
+                        <?php foreach($mods as $m): ?>
+                        <option value="<?= $m['id'] ?>">
+                            <?= $m['nom'] ?>
+                        </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <div class="row">
+                        <div class="col-6"><label>Date :</label><input type="date" name="date_examen" id="ee_date"
+                                class="form-control"></div>
+                        <div class="col-6"><label>Heure :</label><input type="time" name="heure_debut" id="ee_heure"
+                                class="form-control"></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="submit" name="update_exam"
+                        class="btn btn-warning w-100">Enregistrer les modifications</button></div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="addRoomModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content" method="POST" onsubmit="return validateRoomCapacity(this)">
+                <div class="modal-header bg-primary text-white">
+                    <h5>Nouvelle Salle</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label>Nom :</label>
+                    <input type="text" name="nom" class="form-control mb-2" required>
+                    <label>Type :</label>
+                    <select name="type" id="addRoomType" class="form-select mb-2" onchange="updateCapacityLimit('add')">
+                        <option value="Salle">Salle (max 20)</option>
+                        <option value="Amphi">Amphi (max 300)</option>
+                        <option value="Labo">Labo (max 20)</option>
+                    </select>
+                    <label>Capacité :</label>
+                    <input type="number" name="cap" id="addRoomCap" class="form-control" min="1" max="20" required>
+                    <small id="addCapacityHint" class="text-muted">Maximum: 20 places pour une Salle</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" name="add_room" class="btn btn-primary w-100">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="editRoomModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form class="modal-content" method="POST" onsubmit="return validateRoomCapacity(this)">
+                <input type="hidden" name="id" id="er_id">
+                <div class="modal-header bg-warning">
+                    <h5>Modifier la Salle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <label>Nom :</label>
+                    <input type="text" name="nom" id="er_nom" class="form-control mb-2" required>
+                    <label>Type :</label>
+                    <select name="type" id="er_type" class="form-select mb-2" onchange="updateCapacityLimit('edit')">
+                        <option value="Salle">Salle (max 20)</option>
+                        <option value="Amphi">Amphi (max 300)</option>
+                        <option value="Labo">Labo (max 20)</option>
+                    </select>
+                    <label>Capacité :</label>
+                    <input type="number" name="cap" id="er_cap" class="form-control" min="1" required>
+                    <small id="editCapacityHint" class="text-muted">Maximum: 20 places pour une Salle</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" name="update_room" class="btn btn-warning w-100">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+
+        function show(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(id);
+            if (target) {
+                target.classList.add('active');
+                window.location.hash = id;
+            }
+
+
+            document.querySelectorAll('.sidebar button').forEach(btn => {
+                btn.className = 'btn btn-dark w-100 text-start mb-2';
+            });
+
+
+            const activeBtn = document.getElementById('btn-' + id);
+            if (activeBtn) {
+                activeBtn.className = 'btn btn-warning w-100 text-start mb-2 py-2 fw-bold text-dark shadow-sm';
+            }
+        }
+
+
+        function filterExamsByFormation() {
+            let select = document.getElementById('filterFormation');
+            let selectedNom = select.options[select.selectedIndex].getAttribute('data-nom');
+            let rows = document.querySelectorAll('.exam-row');
+
+            rows.forEach(row => {
+                if (select.value === "all") {
+                    row.style.display = "";
+                } else {
+                    row.style.display = (row.getAttribute('data-formation') === selectedNom) ? "" : "none";
+                }
+            });
+        }
+
+
+        function printSpecificFormation() {
+            let formationId = document.getElementById('filterFormation').value;
+            if (formationId === "all") {
+                window.open('export_fpdf.php', '_blank');
+            } else {
+                window.open('export_fpdf.php?formation_id=' + formationId, '_blank');
+            }
+        }
+
+
+        function editExam(e) {
+            document.getElementById('ee_id').value = e.id;
+            document.getElementById('ee_module').value = e.module_id;
+            document.getElementById('ee_date').value = e.date_examen;
+            document.getElementById('ee_heure').value = e.heure_debut;
+            new bootstrap.Modal(document.getElementById('editExamModal')).show();
+        }
+
+
+        function editRoom(r) {
+            
+            document.getElementById('er_id').value = r.id;
+            document.getElementById('er_nom').value = r.nom;
+            document.getElementById('er_type').value = r.type;
+            document.getElementById('er_cap').value = r.capacite;
+            updateCapacityLimit('edit');
+            new bootstrap.Modal(document.getElementById('editRoomModal')).show();
+        }
+// MODIFIER UTILISATEUR
+function editUser(u) {
+    const modal = new bootstrap.Modal(document.getElementById('addUserModal'));
+    const form = document.querySelector('#addUserModal form');
+    form.querySelector('input[name="nom"]').value = u.nom;
+    form.querySelector('input[name="prenom"]').value = u.prenom;
+    form.querySelector('input[name="user"]').value = u.username;
+    form.querySelector('input[name="password"]').value = u.password;
+    form.querySelector('select[name="role"]').value = u.role;
+    form.querySelector('select[name="dept_id"]').value = u.dept_id;
+    form.querySelector('select[name="formation_id"]').value = u.formation_id;
+    
+    // On ajoute un champ ID caché pour la modification
+    if(!document.getElementById('edit_user_id')){
+        form.insertAdjacentHTML('beforeend', `<input type="hidden" name="id" id="edit_user_id" value="${u.id}">`);
+    } else {
+        document.getElementById('edit_user_id').value = u.id;
+    }
+    
+    form.querySelector('button[name="add_user"]').name = "update_user";
+    form.querySelector('button[name="update_user"]').textContent = "Modifier";
+    modal.show();
+}
+
+// MODIFIER DÉPARTEMENT
+function editDept(d) {
+    document.getElementById('ed_id').value = d.id;
+    document.getElementById('ed_nom').value = d.nom;
+    document.getElementById('btn_add_dept').style.display = 'none';
+    document.getElementById('btn_upd_dept').style.display = 'block';
+    new bootstrap.Modal(document.getElementById('addDeptModal')).show();
+}
+
+// MODIFIER FORMATION
+function editForm(f) {
+    document.getElementById('ef_id').value = f.id;
+    document.getElementById('ef_nom').value = f.nom;
+    document.getElementById('ef_dept').value = f.dept_id;
+    document.getElementById('btn_add_form').style.display = 'none';
+    document.getElementById('btn_upd_form').style.display = 'block';
+    new bootstrap.Modal(document.getElementById('addFormModal')).show();
+}
+
+// MODIFIER MODULE
+function editMod(m) {
+    document.getElementById('em_id').value = m.id;
+    document.getElementById('em_nom').value = m.nom;
+    document.getElementById('em_cred').value = m.credits || 0;
+    document.getElementById('em_form').value = m.formation_id;
+    document.getElementById('btn_add_mod').style.display = 'none';
+    document.getElementById('btn_upd_mod').style.display = 'block';
+    new bootstrap.Modal(document.getElementById('addModModal')).show();
+}
+
+        function updateCapacityLimit(mode) {
+            const typeSelect = document.getElementById(mode === 'add' ? 'addRoomType' : 'er_type');
+            const capInput = document.getElementById(mode === 'add' ? 'addRoomCap' : 'er_cap');
+            const hint = document.getElementById(mode === 'add' ? 'addCapacityHint' : 'editCapacityHint');
+
+            const type = typeSelect.value;
+            let maxCap = 20;
+
+            if (type === 'Amphi') {
+                maxCap = 300;
+            }
+
+            capInput.max = maxCap;
+            if (parseInt(capInput.value) > maxCap) {
+                capInput.value = maxCap;
+            }
+            hint.textContent = 'Maximum: ' + maxCap + ' places pour un ' + type;
+        }
+
+
+        function validateRoomCapacity(form) {
+            const type = form.querySelector('select[name="type"]').value;
+            const cap = parseInt(form.querySelector('input[name="cap"]').value);
+
+            let maxCap = 20;
+            if (type === 'Amphi') {
+                maxCap = 300;
+            }
+
+            if (cap > maxCap) {
+                alert('La capacité maximale pour un ' + type + ' est ' + maxCap + ' places.');
+                return false;
+            }
+            if (cap < 1) {
+                alert('La capacité doit être au moins 1.');
+                return false;
+            }
+            return true;
+        }
+
+
+        window.onload = function () {
+            let hash = window.location.hash.replace('#', '');
+            show(hash ? hash : 'dash');
+        };
+
+
+        function generateTimetable() {
+            const startDate = document.getElementById('genStartDate').value;
+            const endDate = document.getElementById('genEndDate').value;
+            const deptFilter = document.getElementById('genDeptFilter').value;
+
+            if (!startDate || !endDate) {
+                alert('Veuillez sélectionner les dates de début et de fin.');
+                return;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                alert('La date de début doit être avant la date de fin.');
+                return;
+            }
+
+
+            document.getElementById('genProgress').style.display = 'block';
+            document.getElementById('genResult').style.display = 'none';
+            document.getElementById('btnGenerate').disabled = true;
+
+
+            const formData = new FormData();
+            formData.append('action', 'generate');
+            formData.append('start_date', startDate);
+            formData.append('end_date', endDate);
+            formData.append('dept_filter', deptFilter);
+
+            fetch('generate_timetable.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Debug logging
+                    if (data.stats && data.stats.assignments_log) {
+                        console.group("Assignment Logs");
+                        data.stats.assignments_log.forEach(log => console.log(log));
+                        console.groupEnd();
+                    }
+
+                    document.getElementById('genProgress').style.display = 'none';
+                    document.getElementById('btnGenerate').disabled = false;
+
+                    const resultDiv = document.getElementById('genResult');
+                    resultDiv.style.display = 'block';
+
+                    if (data.success) {
+                        let html = `<div class="alert alert-success">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>${data.message}</strong>
+                    </div>`;
+
+
+                        html += `<div class="row g-2 mb-2">
+                        <div class="col-auto"><span class="badge bg-success">${data.stats.scheduled} planifiés</span></div>
+                        <div class="col-auto"><span class="badge bg-secondary">${data.stats.total_modules} total</span></div>
+                        ${data.stats.conflicts > 0 ? `<div class="col-auto"><span class="badge bg-warning text-dark">${data.stats.conflicts} conflits</span></div>` : ''}
+                    </div>`;
+
+
+                        if (data.conflicts && data.conflicts.length > 0) {
+                            html += `<div class="alert alert-warning mt-2">
+                            <strong><i class="bi bi-exclamation-triangle me-1"></i>Modules non planifiés :</strong>
+                            <ul class="mb-0 mt-1">`;
+                            data.conflicts.forEach(c => {
+                                html += `<li>${c.module} (${c.formation}) - ${c.reason}</li>`;
+                            });
+                            html += `</ul></div>`;
+                        }
+
+                        html += `<div class="mt-3"><button class="btn btn-primary btn-sm" onclick="window.location.reload()"><i class="bi bi-arrow-clockwise me-1"></i> Rafraîchir pour voir le planning</button></div>`;
+
+                        resultDiv.innerHTML = html;
+
+                        /* 
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 2000); 
+                        */
+                    } else {
+                        resultDiv.innerHTML = `<div class="alert alert-danger">
+                        <i class="bi bi-x-circle me-2"></i>
+                        <strong>Erreur :</strong> ${data.message}
+                    </div>`;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('genProgress').style.display = 'none';
+                    document.getElementById('btnGenerate').disabled = false;
+                    document.getElementById('genResult').style.display = 'block';
+                    document.getElementById('genResult').innerHTML = `<div class="alert alert-danger">
+                    <i class="bi bi-x-circle me-2"></i>
+                    <strong>Erreur de connexion :</strong> ${error.message}
+                </div>`;
+                });
+        }
+
+        function clearTimetable() {
+            const startDate = document.getElementById('genStartDate').value;
+            const endDate = document.getElementById('genEndDate').value;
+            const deptFilter = document.getElementById('genDeptFilter').value;
+
+            if (!startDate || !endDate) {
+                alert('Veuillez sélectionner les dates de début et de fin.');
+                return;
+            }
+
+            const deptText = deptFilter ? 'pour le département sélectionné' : 'pour tous les départements';
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer tous les examens entre ${startDate} et ${endDate} ${deptText} ?`)) {
+                return;
+            }
+
+
+            document.getElementById('genProgress').style.display = 'block';
+            document.getElementById('genResult').style.display = 'none';
+            document.getElementById('btnClear').disabled = true;
+
+            const formData = new FormData();
+            formData.append('action', 'clear');
+            formData.append('start_date', startDate);
+            formData.append('end_date', endDate);
+            formData.append('dept_filter', deptFilter);
+
+            fetch('generate_timetable.php', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('genProgress').style.display = 'none';
+                    document.getElementById('btnClear').disabled = false;
+
+                    const resultDiv = document.getElementById('genResult');
+                    resultDiv.style.display = 'block';
+
+                    if (data.success) {
+                        resultDiv.innerHTML = `<div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        ${data.message}
+                    </div>`;
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        resultDiv.innerHTML = `<div class="alert alert-danger">
+                        <i class="bi bi-x-circle me-2"></i>
+                        <strong>Erreur :</strong> ${data.message}
+                    </div>`;
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('genProgress').style.display = 'none';
+                    document.getElementById('btnClear').disabled = false;
+                    document.getElementById('genResult').style.display = 'block';
+                    document.getElementById('genResult').innerHTML = `<div class="alert alert-danger">
+                    <i class="bi bi-x-circle me-2"></i>
+                    <strong>Erreur :</strong> ${error.message}
+                </div>`;
+                });
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
