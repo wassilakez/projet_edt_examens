@@ -416,6 +416,155 @@
                 </div>
             </div>
 
+<!-- AJOUTER CETTE PARTIE APRÈS LA CARTE "Génération Automatique des Emplois du Temps" -->
+<!-- Dans <div id="exams" class="section"> -->
+
+        <div class="card shadow-sm mb-4 border-info">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Optimisation des Ressources</h5>
+            </div>
+            <div class="card-body">
+                <!-- Bouton principal d'optimisation -->
+                <div class="text-center mb-4">
+                    <button onclick="launchResourceOptimization()" class="btn btn-info btn-lg fw-bold shadow-lg px-5 py-3" 
+                            id="btnOptimize">
+                        <i class="bi bi-play-circle me-2"></i> Lancer l'optimisation des ressources
+                    </button>
+                    <p class="text-muted mt-2"><small>Appliquer toutes les règles d'optimisation automatiquement</small></p>
+                </div>
+        
+                <!-- Barre de progression -->
+                <div id="optimProgress" class="mb-4" style="display:none;">
+                    <div class="progress" style="height: 25px;">
+                        <div id="optimProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-info" 
+                             role="progressbar" style="width: 0%">0%</div>
+                    </div>
+                    <div class="mt-2 text-center" id="optimStatus">
+                        Initialisation de l'algorithme...
+                    </div>
+                </div>
+        
+                <!-- Indicateurs (apparaît après optimisation) -->
+                <div id="optimResults" style="display:none;">
+                    <h5 class="mb-3"><i class="bi bi-graph-up text-info me-2"></i>Résultats de l'optimisation</h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <!-- Taux d'occupation des salles -->
+                        <div class="col-md-4">
+                            <div class="card border-info">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Taux occupation salles</h6>
+                                    <h2 id="indOccupancy">0%</h2>
+                                    <small id="indOccupancyDetail">0/0 salles</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Nombre moyen de surveillances par professeur -->
+                        <div class="col-md-4">
+                            <div class="card border-warning">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Surveillances/prof (moy)</h6>
+                                    <h2 id="indAvgProctoring">0.0</h2>
+                                    <small id="indProctoringRange">Min: 0 - Max: 0</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Écart-type de répartition -->
+                        <div class="col-md-4">
+                            <div class="card border-success">
+                                <div class="card-body text-center">
+                                    <h6 class="text-muted">Écart-type répartition</h6>
+                                    <h2 id="indStdDev">0.0</h2>
+                                    <small id="indEquityStatus" class="text-muted">Équité: N/A</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Détails de l'optimisation -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="bi bi-list-check me-2"></i>Règles appliquées</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Répartition équitable</strong>
+                                            <p class="mb-0 small text-muted">Surveillances équilibrées entre enseignants</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Priorité département</strong>
+                                            <p class="mb-0 small text-muted">Professeurs affectés à leur département</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Regroupement géographique</strong>
+                                            <p class="mb-0 small text-muted">Examens groupés par bâtiment</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                        </div>
+                                        <div>
+                                            <strong>Priorité amphis</strong>
+                                            <p class="mb-0 small text-muted">Amphis utilisés pour gros effectifs</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Résumé -->
+                    <div class="alert alert-success">
+                        <h6><i class="bi bi-check-circle-fill me-2"></i>Optimisation terminée !</h6>
+                        <p class="mb-2">Les ressources ont été optimisées avec succès.</p>
+                        <div class="d-flex justify-content-between">
+                            <button onclick="window.location.reload()" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-arrow-clockwise me-1"></i> Rafraîchir le planning
+                            </button>
+                            <button onclick="exportOptimizationReport()" class="btn btn-info btn-sm">
+                                <i class="bi bi-download me-1"></i> Télécharger rapport
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ajoutez ce bouton temporairement dans la section d'optimisation -->
+<button onclick="testOptimization()" class="btn btn-secondary btn-sm mt-2">
+    <i class="bi bi-bug"></i> Tester l'affichage
+</button>
+                
+                <!-- Logs en temps réel -->
+                <div id="optimLogsContainer" style="display:none;">
+                    <h6><i class="bi bi-terminal me-1"></i> Logs d'exécution</h6>
+                    <div class="bg-dark text-light p-3 rounded" style="max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.9rem;">
+                        <div id="optimLogs">
+                            <!-- Les logs apparaîtront ici -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
             <div class="card shadow-sm mb-4 border-warning">
                 <div class="card-body bg-white">
@@ -1043,6 +1192,266 @@ function editMod(m) {
                 </div>`;
                 });
         }
+
+        // Fonction principale d'optimisation
+        function launchResourceOptimization() {
+    // Récupérer la période des examens existants
+    const startDate = document.getElementById('genStartDate')?.value || '<?= date('Y-m-d') ?>';
+    const endDate = document.getElementById('genEndDate')?.value || '<?= date('Y-m-d', strtotime('+2 weeks')) ?>';
+    
+    // Afficher la progression et masquer les anciens résultats
+    document.getElementById('optimResults').style.display = 'none';
+    document.getElementById('optimProgress').style.display = 'block';
+    
+    const progressBar = document.getElementById('optimProgressBar');
+    const statusText = document.getElementById('optimStatus');
+    const btn = document.getElementById('btnOptimize');
+    
+    // Réinitialiser
+    progressBar.style.width = '0%';
+    progressBar.textContent = '0%';
+    btn.disabled = true;
+    
+    // Démarrer le processus d'optimisation RÉELLE
+    simulateOptimizationProcess(startDate, endDate, progressBar, statusText);
+}
+        
+        function simulateOptimizationProcess(startDate, endDate, progressBar, statusText) {
+    // Envoyer la requête au backend pour optimisation RÉELLE IMMÉDIATEMENT
+    // Pas de simulation, on appelle directement le backend
+    
+    // Mettre la barre de progression à 20% pour montrer qu'on commence
+    progressBar.style.width = '20%';
+    progressBar.textContent = '20%';
+    statusText.textContent = "🔄 Initialisation de l'optimisation...";
+    
+    // Appeler le backend RÉEL
+    applyRealOptimization(startDate, endDate, progressBar, statusText);
+}
+        
+    function applyRealOptimization(startDate, endDate, progressBar, statusText) {
+    // Mettre à jour la progression
+    progressBar.style.width = '40%';
+    progressBar.textContent = '40%';
+    statusText.textContent = "⚖️ Application des règles d'optimisation...";
+    
+    console.log('Envoi de la requête à optimize_resources.php...');
+    console.log('Dates:', startDate, 'à', endDate);
+    
+    // Envoyer la requête au backend pour optimisation RÉELLE
+    fetch('optimize_resources.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            action: 'optimize_all',
+            start_date: startDate,
+            end_date: endDate,
+            rules: {
+                fair_distribution: true,
+                department_priority: true,
+                geographic_grouping: true,
+                amphi_priority: true
+            }
+        })
+    })
+    .then(response => {
+        console.log('Réponse reçue, status:', response.status, response.statusText);
+        
+        // Mettre à jour la progression
+        progressBar.style.width = '60%';
+        progressBar.textContent = '60%';
+        statusText.textContent = "📊 Traitement des données...";
+        
+        // Vérifier si la réponse est du JSON
+        const contentType = response.headers.get("content-type");
+        console.log('Content-Type:', contentType);
+        
+        if (!response.ok) {
+            return response.text().then(text => {
+                console.error('Erreur HTTP - Contenu:', text);
+                throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
+            });
+        }
+        
+        if (!contentType || !contentType.includes("application/json")) {
+            return response.text().then(text => {
+                console.error('Réponse non-JSON reçue:', text.substring(0, 500));
+                throw new Error('Le serveur a retourné une réponse non-JSON (probablement une erreur PHP)');
+            });
+        }
+        
+        return response.json();
+    })
+    .then(data => {
+        console.log('Données JSON reçues du serveur:', data);
+        
+        // Mettre à jour la progression finale
+        progressBar.style.width = '100%';
+        progressBar.textContent = '100%';
+        statusText.textContent = "✅ Optimisation terminée !";
+        
+        // Masquer la barre de progression après un délai
+        setTimeout(() => {
+            document.getElementById('optimProgress').style.display = 'none';
+            
+            if(data && data.success) {
+                // Afficher les résultats avec les VRAIES données
+                displayRealResults(data);
+            } else {
+                // Afficher une erreur
+                displayError('Erreur d\'optimisation: ' + (data?.message || 'Raison inconnue'));
+            }
+        }, 500);
+    })
+    .catch(error => {
+        console.error('Erreur détaillée:', error);
+        console.error('Stack:', error.stack);
+        
+        // Masquer la barre de progression
+        document.getElementById('optimProgress').style.display = 'none';
+        
+        // Afficher l'erreur dans les résultats
+        displayError('Erreur: ' + error.message);
+        
+        // Afficher plus de détails en console
+        if (error.message.includes('JSON')) {
+            console.error('Cela signifie probablement que optimize_resources.php contient une erreur PHP');
+            console.error('Ouvrez directement optimize_resources.php dans votre navigateur pour voir l\'erreur');
+        }
+    })
+    .finally(() => {
+        // Réactiver le bouton dans tous les cas
+        const btn = document.getElementById('btnOptimize');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-play-circle me-2"></i> Lancer l\'optimisation des ressources';
+    });
+}
+        
+    function displayRealResults(data) {
+    console.log('Affichage des résultats:', data); // Debug
+    
+    // Afficher le conteneur des résultats
+    const resultsDiv = document.getElementById('optimResults');
+    resultsDiv.style.display = 'block';
+    
+    // Si nous avons des statistiques, les afficher
+    if(data && data.stats) {
+        console.log('Statistiques disponibles:', data.stats); // Debug
+        
+        // 1. Taux d'occupation des salles
+        const occupancyRate = parseFloat(data.stats.occupancy_rate || 0);
+        document.getElementById('indOccupancy').textContent = occupancyRate.toFixed(1) + '%';
+        document.getElementById('indOccupancyDetail').textContent = 
+            (data.stats.used_rooms || 0) + '/' + (data.stats.total_rooms || 0) + ' salles';
+        
+        // 2. Surveillances par professeur
+        const avgProctoring = parseFloat(data.stats.avg_proctoring || 0);
+        document.getElementById('indAvgProctoring').textContent = avgProctoring.toFixed(1);
+        document.getElementById('indProctoringRange').textContent = 
+            'Min: ' + (data.stats.min_proctoring || 0) + ' - Max: ' + (data.stats.max_proctoring || 0);
+        
+        // 3. Écart-type de répartition
+        const stdDev = parseFloat(data.stats.std_dev || 0);
+        document.getElementById('indStdDev').textContent = stdDev.toFixed(1);
+        
+        // Mettre à jour l'état d'équité
+        const equityStatus = document.getElementById('indEquityStatus');
+        if (stdDev < 1.0) {
+            equityStatus.textContent = 'Équité excellente ✓';
+            equityStatus.className = 'text-success';
+        } else if (stdDev < 2.0) {
+            equityStatus.textContent = 'Équité acceptable';
+            equityStatus.className = 'text-warning';
+        } else {
+            equityStatus.textContent = 'Équité faible';
+            equityStatus.className = 'text-danger';
+        }
+        
+        // Mettre à jour l'alerte avec le nombre de changements
+        const alertDiv = document.querySelector('#optimResults .alert');
+        if (alertDiv && data.changes) {
+            const totalChanges = Object.values(data.changes).reduce((a, b) => a + b, 0);
+            const messageDiv = alertDiv.querySelector('p.mb-2');
+            if (messageDiv) {
+                messageDiv.textContent = `Optimisation terminée avec ${totalChanges} modifications appliquées.`;
+            }
+        }
+    } else {
+        displayError('Aucune statistique disponible après optimisation');
+    }
+}
+        
+        function displayError(message) {
+    // Afficher le conteneur des résultats
+    const resultsDiv = document.getElementById('optimResults');
+    resultsDiv.style.display = 'block';
+    
+    // Mettre les indicateurs en état d'erreur
+    document.getElementById('indOccupancy').textContent = 'ERR';
+    document.getElementById('indOccupancyDetail').textContent = 'Erreur';
+    document.getElementById('indAvgProctoring').textContent = 'ERR';
+    document.getElementById('indProctoringRange').textContent = message.substring(0, 30) + '...';
+    document.getElementById('indStdDev').textContent = 'ERR';
+    document.getElementById('indEquityStatus').textContent = 'Erreur';
+    document.getElementById('indEquityStatus').className = 'text-danger';
+    
+    // Modifier l'alerte pour montrer l'erreur
+    const alertDiv = document.querySelector('#optimResults .alert');
+    if (alertDiv) {
+        alertDiv.className = 'alert alert-danger';
+        alertDiv.innerHTML = `
+            <h6><i class="bi bi-exclamation-triangle-fill me-2"></i>Optimisation échouée</h6>
+            <p class="mb-2">${message}</p>
+            <div class="d-flex justify-content-between">
+                <button onclick="window.location.reload()" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Rafraîchir
+                </button>
+                <button onclick="exportOptimizationReport()" class="btn btn-info btn-sm" disabled>
+                    <i class="bi bi-download me-1"></i> Télécharger rapport
+                </button>
+            </div>
+        `;
+    }
+}
+        
+        function exportOptimizationReport() {
+            // Cette fonction reste la même
+            alert('Fonctionnalité d\'export à implémenter');
+            // window.open('export_optimization.php', '_blank');
+        }
+
+        // Fonction de test - à ajouter après les autres fonctions
+function testOptimization() {
+    console.log('Test de l\'optimisation...');
+    
+    // Simuler des données de test
+    const testData = {
+        success: true,
+        message: 'Optimisation terminée avec 15 modifications',
+        changes: {
+            fair_distribution: 5,
+            department_priority: 4,
+            geographic_grouping: 3,
+            amphi_priority: 3
+        },
+        stats: {
+            occupancy_rate: 65.5,
+            used_rooms: 13,
+            total_rooms: 20,
+            avg_proctoring: 3.2,
+            min_proctoring: 1,
+            max_proctoring: 6,
+            std_dev: 1.5
+        }
+    };
+    
+    // Afficher les résultats de test
+    document.getElementById('optimResults').style.display = 'block';
+    displayRealResults(testData);
+}
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
