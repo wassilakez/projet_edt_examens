@@ -30,7 +30,7 @@ if (isset($_POST['submit_login'])) {
                 case 'chef_dep': // <-- On ajoute ce cas
  header("Location: chefdepartement/chef.php"); 
         break;
-                case 'doyen': header("Location: doyen/stats.php"); break;
+                case 'doyen': header("Location: doyen/doyen.html"); break;
                 case 'professeur': header("Location: professeur/planning.php"); break;
                 case 'etudiant': header("Location: etudiant/recherche.php"); break;
                 default: header("Location: index.php");

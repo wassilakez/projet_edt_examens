@@ -2,61 +2,48 @@
 session_start();
 require_once('../includes/connect.php'); 
 
-$resultats = [];
-$erreur = "";
-$nom_formation_saisi = "";
+// Vérification de la session étudiant
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'etudiant') {
+    header("Location: ../login.php?role=etudiant");
+    exit();
+}
+
+$username = $_SESSION['username'];
 
 try {
-    // 1. Récupérer tous les départements pour la liste déroulante
-    $stmtDept = $pdo->query("SELECT * FROM departements ORDER BY nom ASC");
-    $departements = $stmtDept->fetchAll();
+    // 1. Récupérer les infos de l'étudiant (nom, prenom, promo, formation_id)
+    $stmt = $pdo->prepare("
+        SELECT u.nom, u.prenom, u.promo, f.nom as formation, u.formation_id
+        FROM utilisateurs u
+        JOIN formations f ON u.formation_id = f.id
+        WHERE u.username = :uname
+    ");
+    $stmt->execute(['uname' => $username]);
+    $etudiant = $stmt->fetch();
 
-    // 2. Traitement de la recherche
-    if (isset($_GET['rechercher'])) {
-        $id_dept = $_GET['dept_id'] ?? '';
-        $nom_formation_saisi = trim($_GET['nom_formation'] ?? '');
-
-        if (!empty($nom_formation_saisi)) {
-            // ÉTAPE A : Vérifier si le NOM de la formation existe (optionnellement dans ce département)
-            $checkSql = "SELECT id FROM formations WHERE nom = :nom";
-            $params = ['nom' => $nom_formation_saisi];
-
-            if (!empty($id_dept)) {
-                $checkSql .= " AND dept_id = :dept_id";
-                $params['dept_id'] = $id_dept;
-            }
-
-            $stmtCheck = $pdo->prepare($checkSql);
-            $stmtCheck->execute($params);
-            $formation = $stmtCheck->fetch();
-
-            if (!$formation) {
-                $erreur = "Erreur : La formation '" . htmlspecialchars($nom_formation_saisi) . "' n'existe pas ou n'appartient pas à ce département.";
-            } else {
-                // ÉTAPE B : Récupérer les examens
-                $sql = "SELECT e.*, m.nom as matiere, l.nom as salle, u.nom as prof 
-                        FROM examens e
-                        JOIN modules m ON e.module_id = m.id
-                        JOIN lieu_examen l ON e.salle_id = l.id
-                        JOIN utilisateurs u ON e.prof_id = u.id
-                        WHERE m.formation_id = :form_id
-                        ORDER BY e.date_examen ASC, e.heure_debut ASC";
-                
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute(['form_id' => $formation['id']]);
-                $resultats = $stmt->fetchAll();
-                
-                if (empty($resultats)) {
-                    $erreur = "Aucun examen trouvé pour cette formation.";
-                }
-            }
-        } else {
-            $erreur = "Veuillez saisir le nom d'une formation.";
-        }
+    if (!$etudiant) {
+        die("Erreur : étudiant introuvable.");
     }
+
+    // 2. Récupérer les examens de sa formation validés par le doyen
+    $sql = "
+        SELECT e.date_examen, e.heure_debut, e.duree_minutes, m.nom as matiere, l.nom as salle, u.nom as prof
+        FROM examens e
+        JOIN modules m ON e.module_id = m.id
+        JOIN lieu_examen l ON e.salle_id = l.id
+        JOIN utilisateurs u ON e.prof_id = u.id
+        WHERE m.formation_id = :formation_id
+          AND e.statut = 'VALIDE'
+        ORDER BY e.date_examen ASC, e.heure_debut ASC
+    ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['formation_id' => $etudiant['formation_id']]);
+    $resultats = $stmt->fetchAll();
+
 } catch (PDOException $e) {
     die("Erreur technique : " . $e->getMessage());
 }
 
+// Inclure le HTML pour l'affichage
 include 'recherche.html';
 ?>

@@ -1,6 +1,7 @@
 <?php
 // optimize_resources.php
 session_start();
+
 require_once __DIR__ . '/../admin/connexion.php';
 
 header('Content-Type: application/json');
@@ -52,8 +53,10 @@ try {
     echo json_encode([
         'success' => false, 
         'message' => 'Erreur: ' . $e->getMessage(),
-        'error_details' => (ENVIRONMENT === 'development') ? $e->getTraceAsString() : null
-    ]);
+        'error_details' => (defined('ENVIRONMENT') && ENVIRONMENT === 'development') 
+                   ? $e->getTraceAsString() 
+                   : null    
+                   ]);
 }
 
 // ============================================

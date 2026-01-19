@@ -18,21 +18,27 @@ try {
     $stmt_prof->execute(['uname' => $username]);
     $prof_data = $stmt_prof->fetch();
     
-    // On crée la variable que le HTML attend
+    // Nom complet pour l'affichage
     $prof_nom = $prof_data ? $prof_data['prenom'] . " " . $prof_data['nom'] : $username;
 
-    // 2. Requête pour le planning
-    $sql = "SELECT e.date_examen, e.heure_debut,e.duree_minutes, m.nom as matiere, l.nom as salle, l.type
+    // 2. Requête pour le planning (uniquement examens validés par le doyen)
+    $sql = "SELECT e.date_examen, e.heure_debut, e.duree_minutes, m.nom as matiere, l.nom as salle, l.type
             FROM examens e
             JOIN modules m ON e.module_id = m.id
             JOIN lieu_examen l ON e.salle_id = l.id
             JOIN utilisateurs u ON e.prof_id = u.id
             WHERE u.username = :uname
-            ORDER BY e.date_examen ASC";
+              AND e.statut = 'VALIDE'   -- 🔹 uniquement validé par le doyen
+            ORDER BY e.date_examen ASC, e.heure_debut ASC";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['uname' => $username]);
     $surveillances = $stmt->fetchAll();
+
+    // 3. Si pas encore validé, on peut afficher un message
+    if (empty($surveillances)) {
+        $message = "🕒 L’emploi du temps n’a pas encore été validé par le doyen.";
+    }
 
 } catch (PDOException $e) {
     die("Erreur SQL : " . $e->getMessage());

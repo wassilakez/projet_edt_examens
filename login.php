@@ -40,7 +40,7 @@ if (isset($_POST['submit_login'])) {
                 
                 switch ($user['role']) {
                     case 'admin': header("Location: admin/gestion.php"); break;
-                    case 'doyen': header("Location: doyen/stats.php"); break;
+                    case 'doyen': header("Location: doyen/doyen.html"); break;
                     case 'professeur': header("Location: professeur/planning.php"); break;
                     case 'etudiant': header("Location: etudiant/recherche.php"); break;
                     default: header("Location: index.php");

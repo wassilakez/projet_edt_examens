@@ -12,138 +12,36 @@
         :root {
             --prof-primary: #2c3e50;
             --prof-secondary: #34495e;
-            --prof-accent: #e67e22; /* Orange pour attirer l'attention sur les surveillances */
+            --prof-accent: #e67e22;
             --bg-body: #f4f7f6;
         }
-
         body {
-             
-    font-family: 'Poppins', sans-serif;
-    /* Mise à jour du chemin et ajout des réglages de taille */
-    background-image: url('../planing.avif'); /* Retrait du / si l'image est à côté du fichier */
-    
-    background-attachment: fixed;      /* L'image reste fixe lors du scroll */
-    background-size: cover;            /* L'image couvre tout l'écran */
-    background-position: center;       /* L'image est centrée */
-    background-repeat: no-repeat;      /* Évite les répétitions */
-    color: #2c3e50;
-    min-height: 100vh;
-
+            font-family: 'Poppins', sans-serif;
+            background-image: url('../planing.avif');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #2c3e50;
+            min-height: 100vh;
         }
-
-        .dashboard-container {
-            max-width: 1100px;
-            margin: 40px auto;
-        }
-
-        /* Header Style */
-        .prof-header {
-            background: linear-gradient(135deg, var(--prof-primary), var(--prof-secondary));
-            color: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            position: relative;
-            margin-bottom: 30px;
-        }
-
+        .dashboard-container { max-width: 1100px; margin: 40px auto; }
+        .prof-header { background: linear-gradient(135deg, var(--prof-primary), var(--prof-secondary)); color: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; margin-bottom: 30px; }
         .prof-header h1 { font-weight: 700; font-size: 1.8rem; }
         .prof-header p { opacity: 0.9; font-weight: 300; }
-
-        .welcome-badge {
-            background: rgba(255,255,255,0.1);
-            padding: 10px 20px;
-            border-radius: 50px;
-            display: inline-block;
-            margin-top: 10px;
-            backdrop-filter: blur(5px);
-        }
-
-        /* Stats Cards */
-        .stat-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            border: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-        }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            margin-right: 15px;
-        }
-
-        /* Planning Table */
-        .planning-card {
-            background: white;
-            border-radius: 20px;
-            border: none;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-            overflow: hidden;
-        }
-
-        .table thead {
-            background-color: #f8f9fa;
-        }
-
-        .table thead th {
-            color: var(--prof-primary);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            padding: 20px;
-            border: none;
-        }
-
-        .table tbody td {
-            padding: 20px;
-            vertical-align: middle;
-            border-bottom: 1px solid #eee;
-        }
-
-        .badge-role {
-            padding: 8px 15px;
-            border-radius: 50px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
+        .welcome-badge { background: rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 50px; display: inline-block; margin-top: 10px; backdrop-filter: blur(5px); }
+        .stat-card { background: white; border-radius: 15px; padding: 20px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.05); display: flex; align-items: center; }
+        .stat-icon { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 15px; }
+        .planning-card { background: white; border-radius: 20px; border: none; box-shadow: 0 15px 35px rgba(0,0,0,0.05); overflow: hidden; }
+        .table thead { background-color: #f8f9fa; }
+        .table thead th { color: var(--prof-primary); font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; padding: 20px; border: none; }
+        .table tbody td { padding: 20px; vertical-align: middle; border-bottom: 1px solid #eee; }
+        .badge-role { padding: 8px 15px; border-radius: 50px; font-size: 0.8rem; font-weight: 600; }
         .role-chef { background-color: #fff3e0; color: #e67e22; border: 1px solid #ffe0b2; }
         .role-simple { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
-
-        .time-tag {
-            color: var(--prof-primary);
-            font-weight: 700;
-            background: #f0f3f5;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-
-        /* Logout Button */
-        .btn-logout {
-            background: white;
-            color: #e74c3c;
-            border: 2px solid #e74c3c;
-            padding: 10px 25px;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-
-        .btn-logout:hover {
-            background: #e74c3c;
-            color: white;
-        }
+        .time-tag { color: var(--prof-primary); font-weight: 700; background: #f0f3f5; padding: 5px 10px; border-radius: 5px; }
+        .btn-logout { background: white; color: #e74c3c; border: 2px solid #e74c3c; padding: 10px 25px; border-radius: 10px; font-weight: 600; transition: all 0.3s; text-decoration: none; }
+        .btn-logout:hover { background: #e74c3c; color: white; }
     </style>
 </head>
 <body>
@@ -195,7 +93,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (count($surveillances) > 0): ?>
+                    <?php if (!empty($message)): ?>
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <img src="https://cdn-icons-png.flaticon.com/512/4076/4076432.png" width="80" class="mb-3 opacity-50">
+                                <p class="text-muted"><?php echo $message; ?></p>
+                            </td>
+                        </tr>
+                    <?php elseif (count($surveillances) > 0): ?>
                         <?php foreach ($surveillances as $row): ?>
                         <tr>
                             <td class="fw-medium">
